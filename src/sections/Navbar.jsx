@@ -14,6 +14,7 @@ const Navbar = () => {
   const iconTl = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [showBurger, setShowBurger] = useState(true);
+
   useGSAP(() => {
     gsap.set(navRef.current, { xPercent: 100 });
     gsap.set([linksRef.current, contactRef.current], {
@@ -74,14 +75,10 @@ const Navbar = () => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
       setShowBurger(currentScrollY <= lastScrollY || currentScrollY < 10);
-
       lastScrollY = currentScrollY;
     };
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -95,8 +92,10 @@ const Navbar = () => {
     }
     setIsOpen(!isOpen);
   };
+
   return (
     <>
+      {/* ==================== NAV MENU (Side Panel) ==================== */}
       <nav
         ref={navRef}
         className="fixed z-50 flex flex-col justify-between w-full h-full px-10 uppercase bg-black text-white/80 py-28 gap-y-10 md:w-1/2 md:left-1/2"
@@ -118,6 +117,7 @@ const Navbar = () => {
             )
           )}
         </div>
+
         <div
           ref={contactRef}
           className="flex flex-col flex-wrap justify-between gap-8 md:flex-row"
@@ -146,14 +146,20 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      {/* ==================== BURGER TOGGLE BUTTON ==================== */}
       <div
-        className="fixed z-50 flex flex-col items-center justify-center gap-1 transition-all duration-300 bg-black rounded-full cursor-pointer w-14 h-14 md:w-20 md:h-20 top-4 right-10"
+        className="fixed z-[60] flex flex-col items-center justify-center gap-1 
+                   transition-all duration-300 bg-black rounded-full cursor-pointer 
+                   w-14 h-14 md:w-20 md:h-20 
+                   top-6 left-1/2 -translate-x-1/2   /* Centered on mobile */
+                   md:top-8 md:right-10 md:left-auto md:translate-x-0"
         onClick={toggleMenu}
-        style={
-          showBurger
-            ? { clipPath: "circle(50% at 50% 50%)" }
-            : { clipPath: "circle(0% at 50% 50%)" }
-        }
+        style={{
+          clipPath: showBurger 
+            ? "circle(50% at 50% 50%)" 
+            : "circle(0% at 50% 50%)",
+        }}
       >
         <span
           ref={topLineRef}
