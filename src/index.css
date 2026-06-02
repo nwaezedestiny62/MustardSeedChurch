@@ -1,66 +1,79 @@
-/* ✅ IMPORTS MUST COME FIRST */
+/* ============================================= */
+/* ✅ IMPORTS MUST BE AT THE VERY TOP */
+/* ============================================= */
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ✅ Modern Negra (Headings only) */
+/* ============================================= */
+/* Modern Negra Font */
+/* ============================================= */
 @font-face {
   font-family: "Modern Negra";
-  src: url("/fonts/ModernNegra.ttf") format("truetype"); /* 🔥 no spaces in filename */
+  src: url("/fonts/ModernNegra.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap; /* Improves loading performance */
 }
 
-/* 🎨 Theme */
+/* ============================================= */
+/* Tailwind Theme Configuration */
+/* ============================================= */
 @theme {
   --color-primary: #e5e5e0;
   --color-DarkLava: #393632;
   --color-SageGray: #8b8b73;
   --color-gold: #cfa355;
 
-  /* ✅ Default font = Poppins */
   --font-main: "Poppins", sans-serif;
 
   --animate-marquee: marquee 40s infinite linear;
-
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(calc(-100% - var(--gap)));
-    }
-  }
 }
 
-/* 🌍 Base styles */
+/* ============================================= */
+/* Base Styles */
+/* ============================================= */
 @layer base {
   html,
   body {
-    overflow-x: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
   }
 
   body {
     background: #e5e5e0;
     color: black;
-    scroll-behavior: smooth;
-    font-family: var(--font-main); /* ✅ Poppins */
+    font-family: var(--font-main);
   }
 
   .hero-section {
-    width: 100vw !important;
-    max-width: 100% !important;
+    width: 100vw;
+    max-width: 100%;
   }
 
-  /* 🔥 Modern Negra utility */
+  /* Modern Negra Utility */
   .font-modern {
     font-family: "Modern Negra", serif;
   }
 }
 
-/* 🧰 Utilities */
+/* ============================================= */
+/* Keyframes */
+/* ============================================= */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+/* ============================================= */
+/* Utilities */
+/* ============================================= */
 @utility clip-path {
   clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
 }
