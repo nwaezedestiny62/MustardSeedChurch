@@ -7,141 +7,141 @@ import Marquee from "../components/Marquee";
 import { socials } from "../constants";
 
 const Contact = () => {
+  const [result, setResult] = useState("");
   const containerRef = useRef(null);
 
-  const [status, setStatus] = useState("");
-  const items = Array(5).fill("just imagine, I code");
+  const items = ["Mustard Seed Church", "Assemblies of God Ikeja", "Teens Arm", "Faith Grows Here", "Join Us"];
 
-  useGSAP(
-    () => {
-      gsap.from(".social-link", {
-        y: 80,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.2,
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setResult("Sending....");
+
+    const formData = new FormData(event.target);
+    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
       });
-    },
-    { scope: containerRef }
-  );
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+      const data = await response.json();
 
-    // Temporary local test
-    setStatus("Form received successfully.");
-    e.target.reset();
-
-    console.log("Form submitted locally.");
+      if (data.success) {
+        setResult("✅ Form Submitted Successfully! We will reply soon.");
+        event.target.reset();
+      } else {
+        setResult("❌ " + (data.message || "Something went wrong"));
+      }
+    } catch (error) {
+      setResult("❌ Network error. Please try again.");
+    }
   };
+
+  useGSAP(() => {
+    gsap.from(".contact-item", {
+      y: 80,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.2,
+    });
+  }, { scope: containerRef });
 
   return (
     <section
       id="contact"
       ref={containerRef}
-      className="flex flex-col justify-between min-h-screen bg-black"
+      className="flex flex-col justify-between min-h-screen bg-black text-white"
     >
       <div>
         <AnimatedHeaderSection
-          subTitle="You Dream It, I Code It"
-          title="Contact"
-          text="Got a question or project idea? We'd love to hear from you."
+          subTitle={"Teens Arm of Assemblies of God Ikeja"}
+          title="Get In Touch"
+          text="Have a question? Want to join us? Need prayer? We’d love to hear from you."
           textColor="text-white"
           withScrollTrigger
         />
 
-        <div className="flex px-10 font-light text-white uppercase lg:text-[32px] text-[26px] leading-none mb-10">
+        <div className="flex px-6 md:px-10 font-light text-white uppercase lg:text-[32px] text-[26px] leading-none mb-10">
           <div className="flex flex-col w-full gap-10">
-            <div className="social-link">
+
+            {/* Contact Info */}
+            <div className="contact-item">
+              <h2 className="flex items-center gap-3">Send us a message</h2>
+              <div className="w-full h-px my-4 bg-white/30" />
+              <p className="text-white/70 text-lg leading-relaxed">
+                We are excited to connect with you! Whether you want to join Mustard Seed Church, 
+                have a prayer request, or just want to know more — feel free to reach out.
+              </p>
+            </div>
+
+            <div className="contact-item">
               <h2>Email</h2>
               <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl lowercase">
-                johndoe@gmail.com
-              </p>
+              <p className="text-xl">mustardseedchurch@gmail.com</p>
             </div>
 
-            <div className="social-link">
-              <h2>Phone</h2>
+            <div className="contact-item">
+              <h2>Phone / WhatsApp</h2>
+              <div className="w-full h-px my-2 bg-white/30" />
+              <p className="text-xl">+234 __________</p>
+            </div>
+
+            <div className="contact-item">
+              <h2>Location</h2>
               <div className="w-full h-px my-2 bg-white/30" />
               <p className="text-xl">
-                +33 7 12 12 32 12
+                Assemblies of God Ikeja<br />
+                Off Toyin Street, Allen Avenue, Ikeja, Lagos
               </p>
             </div>
 
-            <div className="social-link">
-              <h2>Social Media</h2>
-              <div className="w-full h-px my-2 bg-white/30" />
+            {/* Form */}
+            <div className="contact-item">
+              <h2>Send Message / Prayer Request / Join Us</h2>
+              <div className="w-full h-px my-4 bg-white/30" />
 
-              <div className="flex flex-wrap gap-2">
-                {socials.map((social) => (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs md:text-sm hover:text-white/70 transition"
-                  >
-                    {"{ "}
-                    {social.name}
-                    {" }"}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <div className="social-link">
-              <h2>Message</h2>
-              <div className="w-full h-px my-2 bg-white/30" />
-
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-4 mt-4"
-              >
+              <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
                 <input
                   type="text"
                   name="name"
-                  placeholder="Your name"
+                  placeholder="Your Full Name"
                   required
-                  className="bg-transparent border border-white/30 p-2 text-white"
+                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
                 />
 
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Phone number"
+                  placeholder="Phone Number"
                   required
-                  className="bg-transparent border border-white/30 p-2 text-white"
+                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
                 />
 
                 <textarea
                   name="message"
-                  rows={5}
-                  placeholder="Write your message"
+                  rows={6}
+                  placeholder="Write your message or prayer request here..."
                   required
-                  className="bg-transparent border border-white/30 p-2 text-white"
+                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
                 />
 
                 <button
                   type="submit"
-                  className="border border-white px-4 py-2 hover:bg-white hover:text-black transition"
+                  className="border border-white px-8 py-4 hover:bg-white hover:text-black transition font-medium"
                 >
                   Send Message
                 </button>
-
-                {status && (
-                  <p className="text-sm opacity-80">
-                    {status}
-                  </p>
-                )}
               </form>
+
+              {result && <p className="mt-4 text-center">{result}</p>}
             </div>
+
           </div>
         </div>
       </div>
 
-      <Marquee
-        items={items}
-        className="text-white bg-transparent"
-      />
+      <Marquee items={items} className="text-white bg-transparent" />
     </section>
   );
 };

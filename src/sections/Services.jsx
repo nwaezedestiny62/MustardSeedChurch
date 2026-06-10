@@ -42,9 +42,9 @@ const Services = () => {
     <section id="services" className="bg-black text-white">
 
       <AnimatedHeaderSection
-        subTitle={"Dive into our moments"}
-        title={"Weekly Buzz"}
-        text={`Stay connected, inspired, and uplifted through every section below.`}
+        subTitle={"Teens Arm of Assemblies of God Ikeja"}
+        title={"MSC Moments"}
+        text={`Stay connected, inspired, and on fire for God through powerful worship, Word, and fellowship.`}
         textColor={"text-white"}
         withScrollTrigger={true}
       />
@@ -52,7 +52,7 @@ const Services = () => {
       {servicesData.map((service, index) => {
         const baseClass = "border-t border-white/30 px-6 sm:px-10 py-12 sm:py-16 min-h-screen";
 
-        // 🔹 SPLIT / ANNOUNCEMENT
+        // 🔹 SPLIT / ANNOUNCEMENTS
         if (service.type === "split") {
           return (
             <div
@@ -76,7 +76,7 @@ const Services = () => {
           );
         }
 
-        // 🔹 FULL / FLASHBACKS
+        // 🔹 FULL / FLASHBACKS (Gallery of Powerful Moments)
         if (service.type === "full") {
           const imagesRef = useRef([]);
           const currentIndex = useRef(0);
@@ -141,7 +141,7 @@ const Services = () => {
           );
         }
 
-        // 🔹 VERSE
+        // 🔹 VERSE OF THE WEEK
         if (service.type === "verse") {
           return (
             <div
@@ -163,7 +163,7 @@ const Services = () => {
           );
         }
 
-        // 🔹 VIDEO
+        // 🔹 VIDEO / PROGRAMS
         if (service.type === "video") {
           return (
             <div

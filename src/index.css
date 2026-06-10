@@ -93,3 +93,78 @@
 @utility contact-text-responsive {
   @apply text-[42px] sm:text-[52px] md:text-[62px] lg:text-[100px];
 }
+
+.cta-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 24px;
+  border-radius: 9999px;
+
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.2),
+    rgba(255,255,255,0.1)
+  );
+
+  border: 1px solid rgba(255,255,255,0.2);
+
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  transition: all 0.3s ease;
+
+  animation: floatWiggle 3s ease-in-out infinite;
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+}
+
+.cta-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255,255,255,0.2);
+  filter: blur(20px);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.cta-text {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes floatWiggle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateY(-4px) rotate(2deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}

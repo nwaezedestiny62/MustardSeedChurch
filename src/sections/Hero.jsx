@@ -24,7 +24,7 @@ const Hero = () => {
         style={{ backgroundImage: "url('/bg-texture.png')" }}
       />
 
-      {/* Leaves */}
+      {/* Leaves - Perfect for "Growth" Theme */}
       <img
         src="/leaf-left.png"
         alt="leaf"
@@ -47,11 +47,11 @@ const Hero = () => {
         loading="eager"
       />
 
-      {/* Tree Element */}
+      {/* Tree Element - Mustard Seed Tree of Faith */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[-35]">
         <img
           src="/tree.png"
-          alt="Mustard Seed Tree"
+          alt="Mustard Seed Tree of Faith"
           className={`
             absolute left-1/2 -translate-x-1/2 
             object-contain pointer-events-none
@@ -64,7 +64,7 @@ const Hero = () => {
         />
       </div>
 
-      {/* BIG TITLE */}
+      {/* BIG TITLE - Church Branding */}
       <h1
         className="
           font-[Bodoni_Moda]
@@ -82,25 +82,34 @@ const Hero = () => {
         MUSTARD SEED<br />CHURCH
       </h1>
 
-      {/* Left Text - Church Version */}
-      <div className="absolute left-4 md:left-6 bottom-8 md:bottom-24 max-w-[240px] md:max-w-[250px]">
-        <p className="text-sm text-white/70 mb-2">A Place of Faith & Growth</p>
+      {/* Left Text Block - Powerful & Inspirational */}
+      <div className="absolute left-4 md:left-6 bottom-70 md:bottom-24 max-w-[240px] md:max-w-[280px]">
+        <p className="text-sm text-white/70 mb-2 tracking-widest uppercase">
+          Teens Arm • Assemblies of God Ikeja
+        </p>
         <h2 className="text-[22px] md:text-4xl font-serif leading-tight text-[#e6d3a3]">
-          Small Beginnings,<br />Great Harvest
+          Where Small Seeds<br />Become Mighty Oaks
         </h2>
+        <p className="mt-4 text-sm text-white/80 leading-relaxed">
+          Ikeja, Lagos
+        </p>
       </div>
 
-      {/* Right Text - Church Version */}
-      <div className="absolute right-4 md:right-6 bottom-16 md:bottom-24 max-w-[240px] md:max-w-[260px] text-right">
+      {/* Right Text Block - Engaging CTA */}
+      <div className="absolute right-4 md:right-6 bottom-16 md:bottom-24 max-w-[240px] md:max-w-[280px] text-right">
         <p className="text-sm text-white/70 mb-5 leading-relaxed">
-          Where faith is planted, nurtured, and multiplied.
+          A vibrant Teens Ministry where faith is planted, worship is explosive, 
+          and young destinies are raised to shine for Jesus Christ.
         </p>
-        <a 
-          href="#services" 
-          className="text-white underline underline-offset-4 hover:opacity-80 transition"
-        >
-          Explore Ministries
-        </a>
+<a
+  href="#services"
+  className="cta-button"
+>
+  <span className="cta-glow"></span>
+  <span className="cta-text">
+    Want to know more about us?
+  </span>
+</a>
       </div>
 
     </section>

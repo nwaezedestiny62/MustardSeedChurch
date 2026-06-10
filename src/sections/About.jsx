@@ -5,16 +5,20 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 const About = () => {
-  const text = `Passionate about clean architecture
-    I build scalable, high-performance solutions
-    from prototype to production`;
+  const text = `A vibrant Teens Ministry
+    Sowing seeds of faith
+    Raising giants for the Kingdom`;
 
-  const aboutText = `Obsessed with building fast, intuitive apps—from pixel-perfect React UIs to bulletproof serverless backends. Every line of code is a promise: quality that users feel.
-  When I’m not shipping:
-⚡️ Open-sourcing my latest experiment (or hacking on yours)
-🎥 Teaching devs on Twitch/YouTube—because rising tides lift all ships
-🧗 Rock climbing (problem-solving with real stakes)
-🎸 Strumming chords while CI pipelines pass (multitasking at its finest)`;
+  const aboutText = `Mustard Seed Church is the Teens Arm of Assemblies of God Ikeja. We are passionate about seeing teenagers encounter Jesus in a real and powerful way through anointed worship, in-depth teaching of God’s Word, prayer, fellowship, and purposeful living.
+
+Here, small seeds of faith grow into mighty trees that transform families, schools, and communities. We believe every teen is destined for greatness in Christ.
+
+When we’re not in service:
+⚡️ Hosting powerful programs like National Teens Day
+🎤 Leading explosive praise & worship
+📖 Digging deep into the Scriptures
+🏟️ Building lasting friendships and accountability
+🌍 Preparing teens to shine as light in their world`;
 
   const videoRef = useRef(null);
   const imgRef = useRef(null);
@@ -71,15 +75,15 @@ const About = () => {
   return (
     <section id="about" className="min-h-screen bg-black rounded-b-4xl px-4 sm:px-6 lg:px-10">
       <AnimatedHeaderSection
-        subTitle={"Cod with purpose, Built to scale"}
-        title={"About"}
+        subTitle={"Teens Arm of Assemblies of God Ikeja"}
+        title={"Our Story"}
         text={text}
         textColor={"text-white"}
         withScrollTrigger={true}
       />
 
       <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 pb-16">
-        {/* Video with play button */}
+        {/* Video with play button - Replace /videos/about.mp4 with real worship footage later */}
         <div
           className="relative w-full sm:w-4/5 md:w-2/3 lg:w-1/2 rounded-3xl overflow-hidden cursor-pointer"
           onClick={handlePlay}
@@ -87,15 +91,15 @@ const About = () => {
           {!playing && (
             <img
               ref={imgRef}
-              src="/images/man.jpg"
-              alt="Video cover"
+              src="/images/man.jpg"   // ← Replace with group worship photo
+              alt="Mustard Seed Church Teens Worship"
               className="w-full h-auto object-cover rounded-3xl"
             />
           )}
 
           <video
             ref={videoRef}
-            src="/videos/about.mp4"
+            src="/videos/about.mp4"   // ← Replace with powerful worship / teens service video
             className="w-full h-auto rounded-3xl"
             style={{ display: playing ? "block" : "none" }}
             controls
@@ -112,7 +116,7 @@ const About = () => {
           )}
         </div>
 
-        {/* About text */}
+        {/* About text - Faith-filled & Inspirational */}
         <AnimatedTextLines
           text={aboutText}
           className="w-full lg:w-1/2 text-base sm:text-lg md:text-xl lg:text-2xl text-white/60"
