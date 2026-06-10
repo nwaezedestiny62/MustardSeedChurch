@@ -8,38 +8,35 @@ import About from "./sections/About";
 import Works from "./sections/Works";
 import ContactSummary from "./sections/ContactSummary";
 import Contact from "./sections/Contact";
-import { useProgress } from "@react-three/drei";
 
 const App = () => {
-  const { progress } = useProgress();
   const [isReady, setIsReady] = useState(false);
 
+  // Simple fake loading for better UX (you can remove this later if you want instant load)
   useEffect(() => {
-    if (progress === 100) {
+    const timer = setTimeout(() => {
       setIsReady(true);
-    }
-  }, [progress]);
+    }, 800); // 800ms feels smooth
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <ReactLenis root className="relative w-screen min-h-screen overflow-x-auto">
+    <ReactLenis root className="relative w-screen min-h-screen overflow-x-hidden">
       {!isReady && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light">
           <p className="mb-4 text-xl tracking-widest animate-pulse">
-            Loading {Math.floor(progress)}%
+            Loading Mustard Seed Church...
           </p>
           <div className="relative h-1 overflow-hidden rounded w-60 bg-white/20">
             <div
-              className="absolute top-0 left-0 h-full transition-all duration-300 bg-white"
-              style={{ width: `${progress}%` }}
+              className="absolute top-0 left-0 h-full w-[100%] transition-all duration-700 bg-[#e6d3a3]"
             ></div>
           </div>
         </div>
       )}
-      <div
-        className={`${
-          isReady ? "opacity-100" : "opacity-0"
-        } transition-opacity duration-1000`}
-      >
+
+      <div className={`${isReady ? "opacity-100" : "opacity-0"} transition-opacity duration-1000`}>
         <Navbar />
         <Hero />
         <ServiceSummary />
