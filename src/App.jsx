@@ -26,7 +26,7 @@ const App = () => {
       {!isReady && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light">
           <p className="mb-4 text-xl tracking-widest animate-pulse">
-            Loading Mustard Seed Church...
+            Loading...
           </p>
           <div className="relative h-1 overflow-hidden rounded w-60 bg-white/20">
             <div

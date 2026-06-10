@@ -39,7 +39,7 @@ const Services = () => {
   }, []);
 
   return (
-    <section id="services" className="bg-black text-white">
+    <section id="weekly buzz" className="bg-black text-white">
 
       <AnimatedHeaderSection
         subTitle={"Teens Arm of Assemblies of God Ikeja"}

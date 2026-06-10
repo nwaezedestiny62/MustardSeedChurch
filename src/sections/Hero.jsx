@@ -4,7 +4,7 @@ const Hero = () => {
   const isMobile = useMediaQuery({ maxWidth: 853 });
 
   return (
-    <section className="hero-section relative h-dvh w-full overflow-hidden text-white">
+    <section id="home" className="hero-section relative h-dvh w-full overflow-hidden text-white">
 
       {/* 🔥 BACKGROUND TEXTURE */}
       <div
@@ -83,10 +83,7 @@ const Hero = () => {
       </h1>
 
       {/* Left Text Block - Powerful & Inspirational */}
-      <div className="absolute left-4 md:left-6 bottom-70 md:bottom-24 max-w-[240px] md:max-w-[280px]">
-        <p className="text-sm text-white/70 mb-2 tracking-widest uppercase">
-          Teens Arm • Assemblies of God Ikeja
-        </p>
+      <div className="absolute left-4 md:left-6 bottom-64 md:bottom-24 max-w-[240px] md:max-w-[280px]">
         <h2 className="text-[22px] md:text-4xl font-serif leading-tight text-[#e6d3a3]">
           Where Small Seeds<br />Become Mighty Oaks
         </h2>

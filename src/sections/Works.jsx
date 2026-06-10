@@ -99,7 +99,7 @@ const Works = () => {
   };
 
   return (
-    <section id="work" className="flex flex-col min-h-screen">
+    <section id="members" className="flex flex-col min-h-screen">
       <AnimatedHeaderSection
         subTitle={"Teens Arm of Assemblies of God Ikeja"}
         title={"MSC FAmily"}
