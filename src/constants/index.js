@@ -25,13 +25,15 @@ export const servicesData = [
     verse:
       "Philippians 4:13 — I can do all things through Christ who strengthens me.",
   },
-  {
-    type: "video",
-    title: "Upcoming Programs",
-    description:
-      "Be part of our upcoming events designed to inspire, uplift, and transform lives.",
-    video: "/videos/program.mp4",
-  },
+{
+  type: "video",
+  title: "Live & Upcoming",                    // Clean & Modern
+  // OR
+  // title: "Live Streams & Events",
+  
+  description: "Watch live services and stay updated with powerful upcoming programs and events.",
+  video: "/videos/program.mp4",
+},
 ];
 export const projects = [
   {

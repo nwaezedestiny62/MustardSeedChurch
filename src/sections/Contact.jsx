@@ -1,142 +1,176 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-
 import AnimatedHeaderSection from "../components/AnimatedHeaderSection";
 import Marquee from "../components/Marquee";
-import { socials } from "../constants";
 
 const Contact = () => {
-  const [result, setResult] = useState("");
   const containerRef = useRef(null);
 
-  const items = ["Mustard Seed Church", "Assemblies of God Ikeja", "Teens Arm", "Faith Grows Here", "Join Us"];
+  const items = [
+    "Mustard Seed Church",
+    "Assemblies of God Ikeja",
+    "Teens Arm",
+    "Faith Grows Here",
+    "Join Us",
+    "You're Welcome",
+  ];
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("Sending....");
+  const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
-    const formData = new FormData(event.target);
-    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
-
-    try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData,
+  useGSAP(
+    () => {
+      gsap.from(".animate-in", {
+        opacity: 0,
+        y: 60,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setResult("✅ Form Submitted Successfully! We will reply soon.");
-        event.target.reset();
-      } else {
-        setResult("❌ " + (data.message || "Something went wrong"));
-      }
-    } catch (error) {
-      setResult("❌ Network error. Please try again.");
-    }
-  };
-
-  useGSAP(() => {
-    gsap.from(".contact-item", {
-      y: 80,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.2,
-    });
-  }, { scope: containerRef });
+    },
+    { scope: containerRef }
+  );
 
   return (
     <section
       id="contact"
       ref={containerRef}
-      className="flex flex-col justify-between min-h-screen bg-black text-white"
+      className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col"
     >
-      <div>
+      {/* Subtle background accent */}
+      <div className="absolute inset-0 bg-[radial-gradient(at_center,#ffffff08_0%,transparent_70%)] pointer-events-none" />
+
+      {/* Header */}
+      <div className="pt-20 pb-16">
         <AnimatedHeaderSection
-          subTitle={"Teens Arm of Assemblies of God Ikeja"}
+          subTitle="Teens Arm of Assemblies of God Ikeja"
           title="Get In Touch"
-          text="Have a question? Want to join us? Need prayer? We’d love to hear from you."
+          text="Have a question, prayer request, or want to join us? We'd love to hear from you."
           textColor="text-white"
           withScrollTrigger
         />
+      </div>
 
-        <div className="flex px-6 md:px-10 font-light text-white uppercase lg:text-[32px] text-[26px] leading-none mb-10">
-          <div className="flex flex-col w-full gap-10">
+      <div className="flex-1 px-6 md:px-8 pb-24">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-14 backdrop-blur-md">
+            <div className="grid md:grid-cols-5 gap-12 lg:gap-16">
+              {/* Contact Info */}
+              <div className="md:col-span-2 space-y-10 animate-in">
+                <div>
+                  <h2 className="text-3xl font-bold mb-4">Connect With Us</h2>
+                  <p className="text-white/70 leading-relaxed">
+                    Our doors and hearts are always open. Reach out anytime.
+                  </p>
+                </div>
 
-            {/* Contact Info */}
-            <div className="contact-item">
-              <h2 className="flex items-center gap-3">Send us a message</h2>
-              <div className="w-full h-px my-4 bg-white/30" />
-              <p className="text-white/70 text-lg leading-relaxed">
-                We are excited to connect with you! Whether you want to join Mustard Seed Church, 
-                have a prayer request, or just want to know more — feel free to reach out.
-              </p>
-            </div>
+                <div className="space-y-8 text-lg">
+                  <div className="animate-in flex gap-5">
+                    <span className="text-2xl mt-1">✉️</span>
+                    <div>
+                      <div className="text-sm uppercase tracking-widest text-white/50 mb-1">
+                        Email
+                      </div>
+                      <a
+                        href="mailto:mustardseedchurch@gmail.com"
+                        className="hover:text-amber-400 transition-colors"
+                      >
+                        mustardseedchurch@gmail.com
+                      </a>
+                    </div>
+                  </div>
 
-            <div className="contact-item">
-              <h2>Email</h2>
-              <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl">mustardseedchurch@gmail.com</p>
-            </div>
+                  <div className="animate-in flex gap-5">
+                    <span className="text-2xl mt-1">📞</span>
+                    <div>
+                      <div className="text-sm uppercase tracking-widest text-white/50 mb-1">
+                        Phone / WhatsApp
+                      </div>
+                      <a
+                        href="tel:+234XXXXXXXXXX"
+                        className="hover:text-amber-400 transition-colors"
+                      >
+                        +234 __________ {/* Replace with real number */}
+                      </a>
+                    </div>
+                  </div>
 
-            <div className="contact-item">
-              <h2>Phone / WhatsApp</h2>
-              <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl">+234 __________</p>
-            </div>
+                  <div className="animate-in flex gap-5">
+                    <span className="text-2xl mt-1">📍</span>
+                    <div>
+                      <div className="text-sm uppercase tracking-widest text-white/50 mb-1">
+                        Location
+                      </div>
+                      <p className="leading-relaxed">
+                        Assemblies of God Ikeja
+                        <br />
+                        Off Toyin Street, Allen Avenue
+                        <br />
+                        Ikeja, Lagos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div className="contact-item">
-              <h2>Location</h2>
-              <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl">
-                Assemblies of God Ikeja<br />
-                Off Toyin Street, Allen Avenue, Ikeja, Lagos
-              </p>
-            </div>
+              {/* Form */}
+              <div className="md:col-span-3 animate-in">
+                <h3 className="text-2xl font-semibold mb-8">Send a Message</h3>
 
-            {/* Form */}
-            <div className="contact-item">
-              <h2>Send Message / Prayer Request / Join Us</h2>
-              <div className="w-full h-px my-4 bg-white/30" />
-
-              <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Full Name"
-                  required
-                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
-                />
-
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  required
-                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
-                />
-
-                <textarea
-                  name="message"
-                  rows={6}
-                  placeholder="Write your message or prayer request here..."
-                  required
-                  className="bg-transparent border border-white/30 p-4 text-white placeholder:text-white/50 focus:outline-none focus:border-white"
-                />
-
-                <button
-                  type="submit"
-                  className="border border-white px-8 py-4 hover:bg-white hover:text-black transition font-medium"
+                <form
+                  action="https://api.web3forms.com/submit"
+                  method="POST"
+                  className="space-y-6"
                 >
-                  Send Message
-                </button>
-              </form>
+                  <input 
+                    type="hidden" 
+                    name="access_key" 
+                    value={accessKey} 
+                  />
+                  <input type="hidden" name="subject" value="New Contact Form Submission" />
+                  <input type="hidden" name="from_name" value="Teens Arm Contact Form" />
+                  <input type="hidden" name="redirect" value="https://web3forms.com/success" />
 
-              {result && <p className="mt-4 text-center">{result}</p>}
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    required
+                    className="w-full bg-transparent border border-white/20 rounded-2xl px-6 py-4 focus:border-white outline-none transition-all placeholder:text-white/40"
+                  />
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    required
+                    className="w-full bg-transparent border border-white/20 rounded-2xl px-6 py-4 focus:border-white outline-none transition-all placeholder:text-white/40"
+                  />
+
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone Number (optional)"
+                    className="w-full bg-transparent border border-white/20 rounded-2xl px-6 py-4 focus:border-white outline-none transition-all placeholder:text-white/40"
+                  />
+
+                  <textarea
+                    name="message"
+                    rows={7}
+                    placeholder="Write your message, prayer request, or question here..."
+                    required
+                    className="w-full bg-transparent border border-white/20 rounded-3xl px-6 py-4 focus:border-white outline-none transition-all placeholder:text-white/40 resize-none"
+                  />
+
+                  <button
+                    type="submit"
+                    className="w-full mt-4 bg-white hover:bg-amber-400 text-black font-semibold py-4 rounded-2xl text-lg transition-all active:scale-[0.985]"
+                  >
+                    Send Message
+                  </button>
+                </form>
+              </div>
             </div>
-
           </div>
         </div>
       </div>
