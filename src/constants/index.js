@@ -9,13 +9,26 @@ export const servicesData = [
   },
  {
   type: "full",
-  title: "Flashbacks of MSC",
+  title: "MSC Gallery",
   images: [
     "/images/msc1.jpg",
     "/images/msc2.jpg",
     "/images/msc3.jpg",
     "/images/msc4.jpg",
     "/images/msc5.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
+    "/images/msc6.jpg",
     "/images/msc6.jpg",
   ],
 },
@@ -27,7 +40,7 @@ export const servicesData = [
   },
 {
   type: "video",
-  title: "Live & Upcoming",                    // Clean & Modern
+  title: "Live & Upcoming",              
   // OR
   // title: "Live Streams & Events",
   
@@ -38,95 +51,63 @@ export const servicesData = [
 export const projects = [
   {
     id: 1,
-    name: "Mobile Accessories E-commerce",
+    name: "The Mustard Seed Family",
     description:
-      "An online store specializing in phone accessories including cases, chargers, cables, and power banks with MagSafe compatibility.",
+      "One big family in Christ. Pastors, leaders, teens, and volunteers united in faith, worship, and purpose at Mustard Seed Church Ikeja.",
     href: "",
-    image: "/assets/projects/mobile-accessories-store.jpg",
+    image: "/assets/projects/gallery1.jpg",
     bgImage: "/assets/backgrounds/blanket.jpg",
     frameworks: [
-      { id: 1, name: "React" },
-      { id: 2, name: "Next.js" },
-      { id: 3, name: "Node.js" },
-      { id: 4, name: "MongoDB" },
-      { id: 5, name: "Tailwind CSS" },
+      { id: 1, name: "Leaders" },
+    { id: 2, name: "Teens" },
+    { id: 3, name: "Volunteers" },
     ],
   },
   {
-    id: 2,
-    name: "Plant Shop E-commerce",
-    description:
-      "An online store specializing in rare and decorative plants with a clean, user-friendly interface.",
-    href: "",
-    image: "/assets/projects/plant-shop.jpg",
-    bgImage: "/assets/backgrounds/curtains.jpg",
-    frameworks: [
-      { id: 1, name: "React" },
-      { id: 2, name: "Next.js" },
-      { id: 3, name: "Stripe API" },
-      { id: 4, name: "Tailwind CSS" },
-    ],
-  },
+  id: 2,
+  name: "Teens Pastor",
+  description:
+    "Called by God to shepherd and raise a generation of teenagers who are on fire for Jesus Christ.",
+  href: "",
+  image: "/assets/projects/pastor-oreva.jpg",
+  bgImage: "/assets/backgrounds/bgcoordinators.jpg",
+  frameworks: [
+    { id: 1, name: "Pastor Oreva Ogbor" },
+    { id: 2, name: "Lagos District Teens Coordinator" },
+  ],
+},
+{
+  id: 3,
+  name: "Lead Coordinator",
+  description:
+    "A passionate and dedicated leader helping to guide and coordinate the Teens Ministry with commitment and excellence.",
+  href: "",
+  image: "/assets/projects/mrkeno.jpg",
+  bgImage: "/assets/backgrounds/kenocordinate.jpg",
+  frameworks: [
+    { id: 1, name: "Bro Enakeno Erijoh" },
+    { id: 2, name: "Lead Coordinator" },
+    { id: 3, name: "Teens Ministry" },
+  ],
+},
   {
-    id: 3,
-    name: "Apple Tech Marketplace",
-    description:
-      "An e-commerce platform for Apple products and accessories with deals and category filtering.",
-    href: "",
-    image: "/assets/projects/apple-tech-store.jpg",
-    bgImage: "/assets/backgrounds/map.jpg",
-    frameworks: [
-      { id: 1, name: "Blazor" },
-      { id: 2, name: "ASP.NET Core" },
-      { id: 3, name: "SQL Server" },
-      { id: 4, name: "Bootstrap" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Electronics & Gadgets Store",
-    description:
-      "A multi-category online shop featuring electronics, home appliances, and gaming gear with special offers.",
-    href: "",
-    image: "/assets/projects/electronics-store.jpg",
-    bgImage: "/assets/backgrounds/poster.jpg",
-    frameworks: [
-      { id: 1, name: "Vue.js" },
-      { id: 2, name: "Laravel" },
-      { id: 3, name: "MySQL" },
-      { id: 4, name: "SCSS" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Home Decor Marketplace",
-    description:
-      "A curated collection of designer home decor items, including furniture and artisan vases.",
-    href: "",
-    image: "/assets/projects/home-decor-store.jpg",
-    bgImage: "/assets/backgrounds/table.jpg",
-    frameworks: [
-      { id: 1, name: "Angular" },
-      { id: 2, name: "Firebase" },
-      { id: 3, name: "GraphQL" },
-      { id: 4, name: "Material UI" },
-    ],
-  },
-  {
-    id: 6,
-    name: "Digital Game Store",
-    description:
-      "A gaming platform featuring discounted titles, top sellers, and genre-based browsing.",
-    href: "",
-    image: "/assets/projects/game-store.jpg",
-    bgImage: "/assets/backgrounds/curtains.jpg",
-    frameworks: [
-      { id: 1, name: "Svelte" },
-      { id: 2, name: "Node.js" },
-      { id: 3, name: "MongoDB" },
-      { id: 4, name: "Chakra UI" },
-    ],
-  },
+  id: 4,
+  name: "Teen Coordinators",
+  description:
+    "A committed team of leaders and volunteers helping to nurture and raise teenagers in the fear and knowledge of God.",
+  href: "",
+  image: "/assets/projects/teen-cordinate.jpg",
+  bgImage: "/assets/backgrounds/bgf5.jpg",
+  frameworks: [
+    { id: 1, name: "Minister Seth Ozoemena" },
+    { id: 2, name: "Bro Stephen David" },
+    { id: 3, name: "Sis Blessing Ukachi" },
+    { id: 4, name: "Sis Sikemi Akinfesoye" },
+    { id: 5, name: "Bro Christian Nwagbara" },
+    { id: 6, name: "Bro Ifeanyi Ezeji" },
+    { id: 7, name: "Bro Wisdom Chidiebere" },
+  ],
+},
 ];
 export const socials = [
   { name: "Instagram", href: "https://www.instagram.com/ali.sanatidev/reels/" },

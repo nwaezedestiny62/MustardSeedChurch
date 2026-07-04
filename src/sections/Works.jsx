@@ -137,29 +137,35 @@ const Works = () => {
             {/* divider */}
             <div className="w-full h-0.5 bg-black/80" />
             {/* framework */}
-            <div className="flex px-10 text-xs leading-loose uppercase transtion-all duration-500 md:text-sm gap-x-5 md:group-hover:px-12">
-              {project.frameworks.map((framework) => (
-                <p
-                  key={framework.id}
-                  className="text-black transition-colors duration-500 md:group-hover:text-white"
-                >
-                  {framework.name}
-                </p>
-              ))}
-            </div>
+{/* framework / tags - Wrap after 4 names */}
+<div className="flex px-10 text-xs leading-loose uppercase transition-all duration-500 md:text-sm gap-x-4 gap-y-2 md:group-hover:px-12 flex-wrap">
+  {project.frameworks.map((framework) => (
+    <p
+      key={framework.id}
+      className="text-black transition-colors duration-500 md:group-hover:text-white"
+    >
+      {framework.name}
+    </p>
+  ))}
+</div>
             {/* mobile preview image */}
-            <div className="relative flex items-center justify-center px-10 md:hidden h-[400px]">
-              <img
-                src={project.bgImage}
-                alt={`${project.name}-bg-image`}
-                className="object-cover w-full h-full rounded-md brightness-50"
-              />
-              <img
-                src={project.image}
-                alt={`${project.name}-image`}
-                className="absolute bg-center px-14 rounded-xl"
-              />
-            </div>
+{/* Mobile Preview with Nice Frame */}
+<div className="relative flex items-center justify-center px-10 md:hidden h-[420px]">
+  <img
+    src={project.bgImage}
+    alt={`${project.name}-bg-image`}
+    className="object-cover w-full h-full rounded-3xl brightness-50"
+  />
+  
+  {/* Portrait Image with Elegant Frame */}
+  <div className="absolute border-[6px] border-white/90 shadow-2xl overflow-hidden">
+    <img
+      src={project.image}
+      alt={`${project.name}-image`}
+      className="w-70 h-72 object-cover"
+    />
+  </div>
+</div>
           </div>
         ))}
         {/* desktop Flaoting preview image */}
