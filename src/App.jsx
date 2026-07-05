@@ -1,125 +1,61 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Upload, Edit2, Trash2, Save, Plus } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // ← Add this
 
-const Admin = () => {
-  const [activeTab, setActiveTab] = useState('services');
-  const [services, setServices] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('');
+import Navbar from "./sections/Navbar";
+import Hero from "./sections/Hero";
+import ServiceSummary from "./sections/ServiceSummary";
+import Services from "./sections/Services";
+import ReactLenis from "lenis/react";
+import About from "./sections/About";
+import Works from "./sections/Works";
+import ContactSummary from "./sections/ContactSummary";
+import Contact from "./sections/Contact";
+
+import Admin from "./pages/Admin"; // ← Import Admin
+
+const App = () => {
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    fetchData();
+    const timer = setTimeout(() => setIsReady(true), 800);
+    return () => clearTimeout(timer);
   }, []);
 
-  const fetchData = async () => {
-    const { data: serv } = await supabase.from('services').select('*').order('order');
-    const { data: proj } = await supabase.from('projects').select('*').order('order');
-    setServices(serv || []);
-    setProjects(proj || []);
-  };
-
-  const uploadImage = async (file) => {
-    if (!file) return null;
-    setUploading(true);
-
-    const fileName = `${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage
-      .from('church-assets')
-      .upload(fileName, file);
-
-    if (error) {
-      setMessage('Upload failed: ' + error.message);
-      setUploading(false);
-      return null;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('church-assets')
-      .getPublicUrl(fileName);
-
-    setUploading(false);
-    return publicUrl;
-  };
-
-  const handleAddService = async () => {
-    const newService = {
-      type: 'split',
-      title: 'New Service Title',
-      description: 'Add description here...',
-      order: services.length + 1
-    };
-
-    const { error } = await supabase.from('services').insert([newService]);
-    if (error) setMessage('Error: ' + error.message);
-    else {
-      setMessage('New service added!');
-      fetchData();
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold mb-2">Mustard Seed Church Admin</h1>
-        <p className="text-zinc-400 mb-10">Permanent Content Management</p>
-
-        {message && (
-          <div className="bg-emerald-600/20 border border-emerald-600 p-4 rounded-2xl mb-6">
-            {message}
+    <Router> {/* Wrap everything with Router */}
+      <ReactLenis root className="relative w-screen min-h-screen overflow-x-hidden">
+        {!isReady && (
+          <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light">
+            <p className="mb-4 text-xl tracking-widest animate-pulse">Loading...</p>
+            <div className="relative h-1 overflow-hidden rounded w-60 bg-white/20">
+              <div className="absolute top-0 left-0 h-full w-[100%] transition-all duration-700 bg-[#e6d3a3]"></div>
+            </div>
           </div>
         )}
 
-        <div className="flex gap-8 border-b border-zinc-800 mb-8">
-          <button 
-            onClick={() => setActiveTab('services')}
-            className={`pb-4 text-lg font-medium border-b-2 transition ${activeTab === 'services' ? 'border-white text-white' : 'border-transparent text-zinc-400'}`}
-          >
-            Services (MSC Moments)
-          </button>
-          <button 
-            onClick={() => setActiveTab('projects')}
-            className={`pb-4 text-lg font-medium border-b-2 transition ${activeTab === 'projects' ? 'border-white text-white' : 'border-transparent text-zinc-400'}`}
-          >
-            MSC Family (Works)
-          </button>
+        <div className={`${isReady ? "opacity-100" : "opacity-0"} transition-opacity duration-1000`}>
+          <Routes>
+            {/* Public Website */}
+            <Route path="/" element={
+              <>
+                <Navbar />
+                <Hero />
+                <ServiceSummary />
+                <Services />
+                <About />
+                <Works />
+                <ContactSummary />
+                <Contact />
+              </>
+            } />
+
+            {/* Admin CMS */}
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
         </div>
-
-        {activeTab === 'services' && (
-          <>
-            <button 
-              onClick={handleAddService}
-              className="flex items-center gap-3 bg-white text-black px-6 py-4 rounded-2xl hover:bg-white/90 mb-8 font-medium"
-            >
-              <Plus size={22} /> Add New Service Block
-            </button>
-
-            <div className="space-y-6">
-              {services.map((service) => (
-                <div key={service.id} className="bg-zinc-900 p-6 rounded-3xl border border-zinc-700">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-2xl font-semibold">{service.title}</h3>
-                      <p className="text-emerald-400">Type: {service.type}</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <button className="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700">
-                        <Edit2 size={20} />
-                      </button>
-                      <button className="p-3 bg-red-900/30 text-red-400 rounded-xl hover:bg-red-900/50">
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+      </ReactLenis>
+    </Router>
   );
 };
 
-export default Admin;
+export default App;
