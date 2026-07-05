@@ -1,13 +1,15 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import AnimatedHeaderSection from "../components/AnimatedHeaderSection";
-import { projects } from "../constants";
-import { useRef, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 const Works = () => {
   const overlayRefs = useRef([]);
   const previewRef = useRef(null);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [currentIndex, setCurrentIndex] = useState(null);
   const text = `The beautiful people God has planted in Mustard Seed Church. 
@@ -16,6 +18,28 @@ const Works = () => {
   const mouse = useRef({ x: 0, y: 0 });
   const moveX = useRef(null);
   const moveY = useRef(null);
+
+  // Fetch projects from Supabase
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .order('order');
+
+        if (error) throw error;
+        setProjects(data || []);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   useGSAP(() => {
     moveX.current = gsap.quickTo(previewRef.current, "x", {
@@ -38,7 +62,7 @@ const Works = () => {
         trigger: "#project",
       },
     });
-  }, []);
+  }, [projects]);
 
   const handleMouseEnter = (index) => {
     if (window.innerWidth < 768) return;
@@ -98,11 +122,28 @@ const Works = () => {
     moveY.current(mouse.current.y);
   };
 
+  if (loading) {
+    return (
+      <section id="members" className="flex flex-col min-h-screen">
+        <AnimatedHeaderSection
+          subTitle={"Teens Arm of Assemblies of God Ikeja"}
+          title={"MSC Family"}
+          text={text}
+          textColor={"text-black"}
+          withScrollTrigger={true}
+        />
+        <div className="flex items-center justify-center py-20">
+          <p className="text-black/70">Loading projects...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="members" className="flex flex-col min-h-screen">
       <AnimatedHeaderSection
         subTitle={"Teens Arm of Assemblies of God Ikeja"}
-        title={"MSC FAmily"}
+        title={"MSC Family"}
         text={text}
         textColor={"text-black"}
         withScrollTrigger={true}
@@ -136,44 +177,43 @@ const Works = () => {
             </div>
             {/* divider */}
             <div className="w-full h-0.5 bg-black/80" />
-            {/* framework */}
-{/* framework / tags - Wrap after 4 names */}
-<div className="flex px-10 text-xs leading-loose uppercase transition-all duration-500 md:text-sm gap-x-4 gap-y-2 md:group-hover:px-12 flex-wrap">
-  {project.frameworks.map((framework) => (
-    <p
-      key={framework.id}
-      className="text-black transition-colors duration-500 md:group-hover:text-white"
-    >
-      {framework.name}
-    </p>
-  ))}
-</div>
+            {/* framework / tags - Wrap after 4 names */}
+            <div className="flex px-10 text-xs leading-loose uppercase transition-all duration-500 md:text-sm gap-x-4 gap-y-2 md:group-hover:px-12 flex-wrap">
+              {project.frameworks?.map((framework) => (
+                <p
+                  key={framework.id}
+                  className="text-black transition-colors duration-500 md:group-hover:text-white"
+                >
+                  {framework.name}
+                </p>
+              ))}
+            </div>
             {/* mobile preview image */}
-{/* Mobile Preview with Nice Frame */}
-<div className="relative flex items-center justify-center px-10 md:hidden h-[420px]">
-  <img
-    src={project.bgImage}
-    alt={`${project.name}-bg-image`}
-    className="object-cover w-full h-full rounded-3xl brightness-50"
-  />
-  
-  {/* Portrait Image with Elegant Frame */}
-  <div className="absolute border-[6px] border-white/90 shadow-2xl overflow-hidden">
-    <img
-      src={project.image}
-      alt={`${project.name}-image`}
-      className="w-70 h-72 object-cover"
-    />
-  </div>
-</div>
+            {/* Mobile Preview with Nice Frame */}
+            <div className="relative flex items-center justify-center px-10 md:hidden h-[420px]">
+              <img
+                src={project.bg_image}
+                alt={`${project.name}-bg-image`}
+                className="object-cover w-full h-full rounded-3xl brightness-50"
+              />
+              
+              {/* Portrait Image with Elegant Frame */}
+              <div className="absolute border-[6px] border-white/90 shadow-2xl overflow-hidden">
+                <img
+                  src={project.image}
+                  alt={`${project.name}-image`}
+                  className="w-70 h-72 object-cover"
+                />
+              </div>
+            </div>
           </div>
         ))}
-        {/* desktop Flaoting preview image */}
+        {/* desktop Floating preview image */}
         <div
           ref={previewRef}
           className="fixed -top-2/6 left-0 z-50 overflow-hidden border-8 border-black pointer-events-none w-[960px] md:block hidden opacity-0"
         >
-          {currentIndex !== null && (
+          {currentIndex !== null && projects[currentIndex] && (
             <img
               src={projects[currentIndex].image}
               alt="preview"
