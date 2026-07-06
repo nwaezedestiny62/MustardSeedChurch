@@ -147,7 +147,7 @@ const About = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-10 left-10">
                   <p className="text-[10px] font-black uppercase tracking-[5px] text-emerald-400 mb-2">The Founder's Vision</p>
-                  <h4 className="text-3xl font-black italic uppercase tracking-tighter">Pst. Wisdom John</h4>
+                  <h4 className="text-3xl font-black italic uppercase tracking-tighter">Late Prince Barrister Ben Ukadike</h4>
                 </div>
               </div>
             </div>
@@ -160,9 +160,9 @@ const About = () => {
                 <p className="story-para opacity-100">
                   In the heart of Ikeja, a small group of teenagers began to meet. They were looking for more than just a Sunday routine; they were looking for a home, a purpose, and a real connection with God.
                 </p>
-                <p className="story-para opacity-100">
-                  What began as a simple gathering of seeds soon transformed into an <strong>Explosive Encounter</strong>. Under the leadership of Pst. Wisdom John, the Mustard Seed Church (MSC) was birthed with a singular, burning vision: <em>To sow seeds of faith and raise giants for the Kingdom of God.</em>
-                </p>
+<p className="story-para opacity-100">
+  What began as a simple gathering of seeds soon blossomed into an <strong>Explosive Encounter</strong>. Under the leadership of the Late Barrister Ben Ukadike, alongside faithful pioneers such as Reverend Emma Ossai, James and Mrs. Chichi Okereke, Deacon Patrick Ajah and Deaconess Cynthia Ajah, Mr. and Mrs. Omobare, and Mr. and Mrs. John Obasi Kalu, among many others, <strong>The Mustard Seed Church (MSC)</strong> was birthed with a singular, burning vision: <em>to sow seeds of faith and raise giants for the Kingdom of God.</em>
+</p>
                 <p className="story-para opacity-100">
                   Today, MSC stands as a vibrant beacon of hope within Assemblies of God Ikeja. We are a generation that refuses to be silent, a movement that is rewriting the narrative of what it means to be a Christian teenager in the modern world.
                 </p>
