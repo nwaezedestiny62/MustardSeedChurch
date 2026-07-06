@@ -1,820 +1,595 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Upload, Edit2, Trash2, Save, Plus, X, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { supabase } from "../lib/supabase";
+import { useImageUpload } from "../hooks/useImageUpload";
+import { 
+  Plus, Save, Trash2, Edit2, X, Image as ImageIcon, 
+  Video, Type, Layout, List, Lock, AlertCircle, ShieldCheck, Key, ChevronRight
+} from "lucide-react";
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState('services');
+  // Security States
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [entryPassword, setEntryPassword] = useState("");
+  
+  // Action Gate States
+  const [showGate, setShowGate] = useState(false);
+  const [gateType, setGateType] = useState(null); // 'add', 'save', 'delete'
+  const [gatePassword, setGatePassword] = useState("");
+  const [pendingAction, setPendingAction] = useState(null);
+  const [pendingId, setPendingId] = useState(null);
+
+  // Data States
   const [services, setServices] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [editingService, setEditingService] = useState(null);
-  const [editingProject, setEditingProject] = useState(null);
-  const [showServiceModal, setShowServiceModal] = useState(false);
-  const [showProjectModal, setShowProjectModal] = useState(false);
-
-  // Form states
-  const [serviceForm, setServiceForm] = useState({
-    type: 'split',
-    title: '',
-    description: '',
-    image: '',
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    type: "split",
+    title: "",
+    description: "",
+    image: "",
     images: [],
-    video: '',
-    verse: '',
+    video: "",
+    verse: "",
     live_streams: [],
-    discover_more_link: '',
+    discover_more_link: "",
     order: 0,
   });
 
-  const [projectForm, setProjectForm] = useState({
-    name: '',
-    description: '',
-    image: '',
-    bg_image: '',
-    frameworks: [],
-    order: 0,
-  });
+  const { uploadImage, uploading } = useImageUpload("mscmedia");
+  const fileInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
-  const [liveStreamForm, setLiveStreamForm] = useState({
-    title: '',
-    youtube_id: '',
-    facebook_url: '',
-    schedule: '',
-    is_live: false,
-  });
+  const PASSWORDS = {
+    ENTRY: "volkeno123msc",
+    ADD: "musiciology",
+    SAVE: "password",
+    DELETE: "purplerain"
+  };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated) {
+      fetchServices();
+    }
+  }, [isAuthenticated]);
 
-  const fetchData = async () => {
+  const fetchServices = async () => {
+    setLoading(true);
     try {
-      const { data: serv, error: servError } = await supabase
-        .from('services')
-        .select('*')
-        .order('order');
-      
-      const { data: proj, error: projError } = await supabase
-        .from('projects')
-        .select('*')
-        .order('order');
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("order", { ascending: true });
 
-      if (servError) throw servError;
-      if (projError) throw projError;
-
-      setServices(serv || []);
-      setProjects(proj || []);
-    } catch (error) {
-      setMessage('Error fetching data: ' + error.message);
+      if (error) throw error;
+      setServices(data || []);
+    } catch (err) {
+      console.error("Error fetching services:", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const uploadImage = async (file) => {
-    if (!file) return null;
-    setUploading(true);
-
-    try {
-      const fileName = `${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('mscmedia')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('mscmedia')
-        .getPublicUrl(fileName);
-
-      setMessage('Image uploaded successfully!');
-      setUploading(false);
-      return publicUrl;
-    } catch (error) {
-      setMessage('Upload failed: ' + error.message);
-      setUploading(false);
-      return null;
+  const handleEntryLogin = (e) => {
+    e.preventDefault();
+    if (entryPassword === PASSWORDS.ENTRY) {
+      setIsAuthenticated(true);
+    } else {
+      alert("Incorrect Entry Password");
+      setEntryPassword("");
     }
   };
 
-  // ==================== SERVICES HANDLERS ====================
+  const openGate = (type, action, id = null) => {
+    setGateType(type);
+    setPendingAction(() => action);
+    setPendingId(id);
+    setShowGate(true);
+  };
 
-  const handleAddService = () => {
-    setServiceForm({
-      type: 'split',
-      title: '',
-      description: '',
-      image: '',
+  const verifyGate = (e) => {
+    e.preventDefault();
+    const correctPassword = PASSWORDS[gateType.toUpperCase()];
+    
+    if (gatePassword === correctPassword) {
+      if (typeof pendingAction === 'function') {
+        pendingAction();
+      }
+      setShowGate(false);
+      setGatePassword("");
+      setGateType(null);
+      setPendingAction(null);
+    } else {
+      alert(`Incorrect Password for ${gateType.toUpperCase()}`);
+      setGatePassword("");
+    }
+  };
+
+  const handleAddRequest = () => {
+    const action = () => {
+      resetForm();
+      setShowModal(true);
+    };
+    openGate('add', action);
+  };
+
+  const handleSaveRequest = () => {
+    const action = async () => {
+      setLoading(true);
+      try {
+        if (editingId) {
+          const { error } = await supabase
+            .from("services")
+            .update(formData)
+            .eq("id", editingId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from("services").insert([formData]);
+          if (error) throw error;
+        }
+        setShowModal(false);
+        resetForm();
+        fetchServices();
+      } catch (err) {
+        alert("Error saving: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    openGate('save', action);
+  };
+
+  const handleDeleteRequest = (id) => {
+    const action = async () => {
+      setLoading(true);
+      try {
+        const { error } = await supabase.from("services").delete().eq("id", id);
+        if (error) throw error;
+        fetchServices();
+      } catch (err) {
+        alert("Error deleting: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    openGate('delete', action, id);
+  };
+
+  const handleImageUpload = async (e, field) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = await uploadImage(file, "services");
+      if (url) {
+        if (field === "images") {
+          setFormData({ ...formData, images: [...formData.images, url] });
+        } else {
+          setFormData({ ...formData, [field]: url });
+        }
+      }
+    }
+  };
+
+  const handleStreamCoverUpload = async (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = await uploadImage(file, "streams");
+      if (url) {
+        const newStreams = [...formData.live_streams];
+        newStreams[index].cover_image = url;
+        setFormData({ ...formData, live_streams: newStreams });
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setFormData({
+      type: "split",
+      title: "",
+      description: "",
+      image: "",
       images: [],
-      video: '',
-      verse: '',
+      video: "",
+      verse: "",
       live_streams: [],
-      discover_more_link: '',
+      discover_more_link: "",
       order: services.length,
     });
-    setEditingService(null);
-    setShowServiceModal(true);
   };
 
-  const handleEditService = (service) => {
-    setServiceForm(service);
-    setEditingService(service.id);
-    setShowServiceModal(true);
-  };
-
-  const handleSaveService = async () => {
-    try {
-      if (editingService) {
-        const { error } = await supabase
-          .from('services')
-          .update(serviceForm)
-          .eq('id', editingService);
-        
-        if (error) throw error;
-        setMessage('Service updated successfully!');
-      } else {
-        const { error } = await supabase
-          .from('services')
-          .insert([serviceForm]);
-        
-        if (error) throw error;
-        setMessage('Service added successfully!');
-      }
-
-      setShowServiceModal(false);
-      fetchData();
-    } catch (error) {
-      setMessage('Error saving service: ' + error.message);
-    }
-  };
-
-  const handleDeleteService = async (id) => {
-    if (!confirm('Are you sure you want to delete this service?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('services')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      setMessage('Service deleted successfully!');
-      fetchData();
-    } catch (error) {
-      setMessage('Error deleting service: ' + error.message);
-    }
-  };
-
-  // ==================== PROJECTS HANDLERS ====================
-
-  const handleAddProject = () => {
-    setProjectForm({
-      name: '',
-      description: '',
-      image: '',
-      bg_image: '',
-      frameworks: [],
-      order: projects.length,
+  const editService = (service) => {
+    setEditingId(service.id);
+    setFormData({
+      type: service.type || "split",
+      title: service.title || "",
+      description: service.description || "",
+      image: service.image || "",
+      images: service.images || [],
+      video: service.video || "",
+      verse: service.verse || "",
+      live_streams: service.live_streams || [],
+      discover_more_link: service.discover_more_link || "",
+      order: service.order || 0,
     });
-    setEditingProject(null);
-    setShowProjectModal(true);
+    setShowModal(true);
   };
 
-  const handleEditProject = (project) => {
-    setProjectForm(project);
-    setEditingProject(project.id);
-    setShowProjectModal(true);
-  };
-
-  const handleSaveProject = async () => {
-    try {
-      if (editingProject) {
-        const { error } = await supabase
-          .from('projects')
-          .update(projectForm)
-          .eq('id', editingProject);
-        
-        if (error) throw error;
-        setMessage('Project updated successfully!');
-      } else {
-        const { error } = await supabase
-          .from('projects')
-          .insert([projectForm]);
-        
-        if (error) throw error;
-        setMessage('Project added successfully!');
-      }
-
-      setShowProjectModal(false);
-      fetchData();
-    } catch (error) {
-      setMessage('Error saving project: ' + error.message);
-    }
-  };
-
-  const handleDeleteProject = async (id) => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      setMessage('Project deleted successfully!');
-      fetchData();
-    } catch (error) {
-      setMessage('Error deleting project: ' + error.message);
-    }
-  };
-
-  // ==================== LIVE STREAM MANAGEMENT ====================
-
-  const handleAddLiveStream = () => {
-    setLiveStreamForm({
-      title: '',
-      youtube_id: '',
-      facebook_url: '',
-      schedule: '',
-      is_live: false,
-    });
-  };
-
-  const handleSaveLiveStream = () => {
-    if (!liveStreamForm.title) {
-      setMessage('Please enter a stream title');
-      return;
-    }
-
-    const newStreams = [...(serviceForm.live_streams || []), liveStreamForm];
-    setServiceForm({ ...serviceForm, live_streams: newStreams });
-    setLiveStreamForm({
-      title: '',
-      youtube_id: '',
-      facebook_url: '',
-      schedule: '',
-      is_live: false,
-    });
-    setMessage('Live stream added to service!');
-  };
-
-  const handleRemoveLiveStream = (index) => {
-    const newStreams = serviceForm.live_streams.filter((_, i) => i !== index);
-    setServiceForm({ ...serviceForm, live_streams: newStreams });
-  };
-
-  // ==================== RENDER ====================
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 sm:p-6 font-sans overflow-hidden">
+        <div className="w-full max-w-md bg-zinc-900 p-8 sm:p-10 rounded-[30px] sm:rounded-[40px] border border-white/10 shadow-2xl text-center relative">
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center shadow-2xl border-4 border-black">
+            <Lock className="text-black" size={32} />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black italic uppercase tracking-tighter mb-2 mt-8">Restricted Access</h1>
+          <p className="text-white/40 text-[9px] uppercase tracking-[4px] font-bold mb-8">Mustard Seed Church Admin</p>
+          <form onSubmit={handleEntryLogin} className="space-y-4">
+            <input
+              type="password"
+              placeholder="Enter Entry Password"
+              className="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:border-emerald-500 outline-none transition-all text-center text-sm"
+              value={entryPassword}
+              onChange={(e) => setEntryPassword(e.target.value)}
+              autoFocus
+            />
+            <button type="submit" className="w-full bg-white text-black font-black uppercase tracking-[4px] py-4 rounded-2xl hover:scale-105 active:scale-95 transition-all text-[10px]">
+              Unlock CMS
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2">Mustard Seed Church Admin</h1>
-          <p className="text-zinc-400">Permanent Content Management System</p>
-        </div>
-
-        {/* Message Alert */}
-        {message && (
-          <div className="bg-emerald-600/20 border border-emerald-600 p-4 rounded-2xl mb-6 flex justify-between items-center">
-            <span>{message}</span>
-            <button onClick={() => setMessage('')} className="text-emerald-400 hover:text-emerald-300">
-              <X size={20} />
-            </button>
+    <div className="min-h-screen bg-black text-white p-4 sm:p-8 md:p-12 font-sans overflow-x-hidden">
+      <div className="max-w-6xl mx-auto">
+        <header className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-12 sm:mb-16 text-center sm:text-left">
+          <div className="w-full sm:w-auto">
+            <div className="flex items-center justify-center sm:justify-start gap-3">
+              <h1 className="text-4xl sm:text-5xl font-black italic uppercase tracking-tighter">MSC Admin</h1>
+              <ShieldCheck className="text-emerald-500 hidden sm:block" size={28} />
+            </div>
+            <p className="text-emerald-400 text-[8px] sm:text-[10px] tracking-[4px] sm:tracking-[6px] uppercase font-black mt-2">Secure Management System</p>
           </div>
-        )}
-
-        {/* Tabs */}
-        <div className="flex gap-4 sm:gap-8 border-b border-zinc-800 mb-8 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('services')}
-            className={`pb-4 text-lg font-medium border-b-2 transition whitespace-nowrap ${
-              activeTab === 'services'
-                ? 'border-white text-white'
-                : 'border-transparent text-zinc-400 hover:text-zinc-300'
-            }`}
+          <button 
+            onClick={handleAddRequest}
+            className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white text-black px-8 py-4 rounded-full transition-all hover:scale-105 active:scale-95 font-black text-[10px] uppercase tracking-[2px] sm:tracking-[3px] shadow-xl"
           >
-            Services (MSC Moments)
+            <Plus size={18} strokeWidth={3} /> Add New Section
           </button>
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`pb-4 text-lg font-medium border-b-2 transition whitespace-nowrap ${
-              activeTab === 'projects'
-                ? 'border-white text-white'
-                : 'border-transparent text-zinc-400 hover:text-zinc-300'
-            }`}
-          >
-            MSC Family (Works)
-          </button>
-        </div>
+        </header>
 
-        {/* ==================== SERVICES TAB ==================== */}
-        {activeTab === 'services' && (
-          <div>
-            <button
-              onClick={handleAddService}
-              className="flex items-center gap-3 bg-white text-black px-6 py-3 rounded-2xl hover:bg-white/90 mb-8 font-medium transition"
-            >
-              <Plus size={22} /> Add New Service Block
-            </button>
-
-            <div className="space-y-6">
-              {services.length === 0 ? (
-                <div className="text-center py-12 text-zinc-400">
-                  <p>No services yet. Click "Add New Service Block" to get started.</p>
-                </div>
-              ) : (
-                services.map((service) => (
-                  <div key={service.id} className="bg-zinc-900 p-6 rounded-3xl border border-zinc-700 hover:border-zinc-600 transition">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-2xl font-semibold">{service.title}</h3>
-                        <p className="text-emerald-400 text-sm">Type: {service.type}</p>
-                      </div>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleEditService(service)}
-                          className="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition"
-                        >
-                          <Edit2 size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteService(service.id)}
-                          className="p-3 bg-red-900/30 text-red-400 rounded-xl hover:bg-red-900/50 transition"
-                        >
-                          <Trash2 size={20} />
-                        </button>
+        {/* LIST SECTION */}
+        <div className="space-y-6 sm:space-y-8 pb-20">
+          <div className="flex items-center gap-4 px-2 sm:px-0">
+            <List size={20} className="text-white/20" />
+            <h2 className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter">Current Sections</h2>
+          </div>
+          
+          {loading && services.length === 0 ? (
+            <div className="py-20 sm:py-32 text-center text-white/20 uppercase tracking-[6px] sm:tracking-[8px] font-black text-[10px] animate-pulse">Syncing with Supabase...</div>
+          ) : services.length === 0 ? (
+            <div className="py-20 sm:py-32 text-center border-2 border-dashed border-white/5 rounded-[30px] sm:rounded-[50px] text-white/20 uppercase tracking-[6px] sm:tracking-[8px] font-black text-[10px]">No Content Created</div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
+              {services.map((service) => (
+                <div key={service.id} className="group bg-zinc-900/40 border border-white/5 p-6 sm:p-8 rounded-[30px] sm:rounded-[40px] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:bg-zinc-900/60 transition-all hover:border-white/10 shadow-lg">
+                  <div className="flex items-center gap-4 sm:gap-8 w-full lg:w-auto">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 bg-black rounded-[15px] sm:rounded-[22px] flex items-center justify-center border border-white/5 text-emerald-400 font-black italic text-lg sm:text-xl shadow-inner">
+                      {service.order}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter mb-1 truncate">{service.title}</h3>
+                      <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+                        <span className="flex-shrink-0 text-[7px] sm:text-[8px] font-black uppercase tracking-[2px] text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">{service.type}</span>
+                        <div className="flex-shrink-0 w-1 h-1 rounded-full bg-white/10" />
+                        <p className="text-[9px] sm:text-[10px] text-white/30 truncate italic font-medium">{service.description || service.verse || "Database Content"}</p>
                       </div>
                     </div>
-                    <p className="text-zinc-300 text-sm line-clamp-2">{service.description}</p>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ==================== PROJECTS TAB ==================== */}
-        {activeTab === 'projects' && (
-          <div>
-            <button
-              onClick={handleAddProject}
-              className="flex items-center gap-3 bg-white text-black px-6 py-3 rounded-2xl hover:bg-white/90 mb-8 font-medium transition"
-            >
-              <Plus size={22} /> Add New Project
-            </button>
-
-            <div className="space-y-6">
-              {projects.length === 0 ? (
-                <div className="text-center py-12 text-zinc-400">
-                  <p>No projects yet. Click "Add New Project" to get started.</p>
-                </div>
-              ) : (
-                projects.map((project) => (
-                  <div key={project.id} className="bg-zinc-900 p-6 rounded-3xl border border-zinc-700 hover:border-zinc-600 transition">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-2xl font-semibold">{project.name}</h3>
-                        <p className="text-zinc-400 text-sm">Frameworks: {project.frameworks?.length || 0}</p>
-                      </div>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleEditProject(project)}
-                          className="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition"
-                        >
-                          <Edit2 size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProject(project.id)}
-                          className="p-3 bg-red-900/30 text-red-400 rounded-xl hover:bg-red-900/50 transition"
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-zinc-300 text-sm line-clamp-2">{project.description}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ==================== SERVICE MODAL ==================== */}
-      {showServiceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-zinc-900 rounded-3xl border border-zinc-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-6 flex justify-between items-center">
-              <h2 className="text-2xl font-bold">{editingService ? 'Edit Service' : 'Add New Service'}</h2>
-              <button
-                onClick={() => setShowServiceModal(false)}
-                className="text-zinc-400 hover:text-white transition"
-              >
-                <X size={28} />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Service Type */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Service Type</label>
-                <select
-                  value={serviceForm.type}
-                  onChange={(e) => setServiceForm({ ...serviceForm, type: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="split">Split Layout (Text + Image)</option>
-                  <option value="full">Full Screen Gallery</option>
-                  <option value="verse">Verse of the Week</option>
-                  <option value="video">Live & Upcoming Streams</option>
-                </select>
-              </div>
-
-              {/* Title */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Title</label>
-                <input
-                  type="text"
-                  value={serviceForm.title}
-                  onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                  placeholder="Enter service title"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
-                <textarea
-                  value={serviceForm.description}
-                  onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500 resize-none"
-                  rows="4"
-                  placeholder="Enter service description"
-                />
-              </div>
-
-              {/* Single Image (for split type) */}
-              {serviceForm.type === 'split' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Image</label>
-                  <div className="flex gap-3">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const url = await uploadImage(e.target.files[0]);
-                        if (url) setServiceForm({ ...serviceForm, image: url });
-                      }}
-                      disabled={uploading}
-                      className="flex-1"
-                    />
-                    {serviceForm.image && (
-                      <img src={serviceForm.image} alt="preview" className="w-16 h-16 object-cover rounded-lg" />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Multiple Images (for full type) */}
-              {serviceForm.type === 'full' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Gallery Images</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const url = await uploadImage(e.target.files[0]);
-                      if (url) {
-                        setServiceForm({
-                          ...serviceForm,
-                          images: [...(serviceForm.images || []), url],
-                        });
-                      }
-                    }}
-                    disabled={uploading}
-                    className="w-full mb-3"
-                  />
-                  <div className="flex flex-wrap gap-3">
-                    {serviceForm.images?.map((img, idx) => (
-                      <div key={idx} className="relative">
-                        <img src={img} alt={`gallery-${idx}`} className="w-20 h-20 object-cover rounded-lg" />
-                        <button
-                          onClick={() => {
-                            setServiceForm({
-                              ...serviceForm,
-                              images: serviceForm.images.filter((_, i) => i !== idx),
-                            });
-                          }}
-                          className="absolute -top-2 -right-2 bg-red-600 rounded-full p-1 text-white hover:bg-red-700"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Verse (for verse type) */}
-              {serviceForm.type === 'verse' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Bible Verse</label>
-                  <textarea
-                    value={serviceForm.verse}
-                    onChange={(e) => setServiceForm({ ...serviceForm, verse: e.target.value })}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500 resize-none"
-                    rows="3"
-                    placeholder="Enter the Bible verse"
-                  />
-                </div>
-              )}
-
-              {/* Video (for video type) */}
-              {serviceForm.type === 'video' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Background Video URL</label>
-                  <input
-                    type="text"
-                    value={serviceForm.video}
-                    onChange={(e) => setServiceForm({ ...serviceForm, video: e.target.value })}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="/videos/program.mp4"
-                  />
-                </div>
-              )}
-
-              {/* Live Streams (for video type) */}
-              {serviceForm.type === 'video' && (
-                <div className="border-t border-zinc-700 pt-6">
-                  <h3 className="text-lg font-semibold mb-4">Live Stream Cards</h3>
-
-                  {/* Live Stream List */}
-                  <div className="space-y-3 mb-6">
-                    {serviceForm.live_streams?.map((stream, idx) => (
-                      <div key={idx} className="bg-zinc-800 p-4 rounded-lg flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="font-medium">{stream.title}</p>
-                          <p className="text-sm text-zinc-400">{stream.schedule}</p>
-                          <div className="flex gap-2 mt-2">
-                            {stream.youtube_id && (
-                              <span className="text-xs bg-red-600/30 text-red-300 px-2 py-1 rounded">YouTube</span>
-                            )}
-                            {stream.facebook_url && (
-                              <span className="text-xs bg-blue-600/30 text-blue-300 px-2 py-1 rounded">Facebook</span>
-                            )}
-                            {stream.is_live && (
-                              <span className="text-xs bg-emerald-600/30 text-emerald-300 px-2 py-1 rounded flex items-center gap-1">
-                                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" /> LIVE
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveLiveStream(idx)}
-                          className="text-red-400 hover:text-red-300 transition"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add Live Stream Form */}
-                  <div className="bg-zinc-800 p-4 rounded-lg space-y-3">
-                    <input
-                      type="text"
-                      value={liveStreamForm.title}
-                      onChange={(e) => setLiveStreamForm({ ...liveStreamForm, title: e.target.value })}
-                      placeholder="Stream Title (e.g., Youth Ignition Night)"
-                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    />
-
-                    <input
-                      type="text"
-                      value={liveStreamForm.youtube_id}
-                      onChange={(e) => setLiveStreamForm({ ...liveStreamForm, youtube_id: e.target.value })}
-                      placeholder="YouTube Video ID (e.g., PPa67ZcmS9E)"
-                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    />
-
-                    <input
-                      type="text"
-                      value={liveStreamForm.facebook_url}
-                      onChange={(e) => setLiveStreamForm({ ...liveStreamForm, facebook_url: e.target.value })}
-                      placeholder="Facebook Video URL"
-                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    />
-
-                    <input
-                      type="text"
-                      value={liveStreamForm.schedule}
-                      onChange={(e) => setLiveStreamForm({ ...liveStreamForm, schedule: e.target.value })}
-                      placeholder="Schedule (e.g., Every Friday • 6PM)"
-                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-                    />
-
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={liveStreamForm.is_live}
-                        onChange={(e) => setLiveStreamForm({ ...liveStreamForm, is_live: e.target.checked })}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm">Show LIVE badge</span>
-                    </label>
-
-                    <button
-                      onClick={handleSaveLiveStream}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg transition"
+                  <div className="flex items-center gap-3 w-full lg:w-auto mt-2 lg:mt-0">
+                    <button 
+                      onClick={() => editService(service)}
+                      className="flex-1 lg:flex-none h-12 bg-white/5 hover:bg-white hover:text-black rounded-xl sm:rounded-2xl flex items-center justify-center transition-all border border-white/5 px-4 sm:px-6 font-black text-[9px] uppercase tracking-widest group/btn"
                     >
-                      Add Live Stream
+                      <Edit2 size={14} className="mr-2 group-hover/btn:scale-110 transition-transform" /> Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteRequest(service.id)}
+                      className="flex-1 lg:flex-none h-12 bg-red-900/10 hover:bg-red-600 text-red-500 hover:text-white rounded-xl sm:rounded-2xl flex items-center justify-center transition-all border border-red-900/10 px-4 sm:px-6 font-black text-[9px] uppercase tracking-widest group/btn"
+                    >
+                      <Trash2 size={14} className="mr-2 group-hover/btn:scale-110 transition-transform" /> Delete
                     </button>
                   </div>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
-              {/* Discover More Link */}
-              {serviceForm.type === 'video' && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Discover More Link</label>
-                  <input
-                    type="text"
-                    value={serviceForm.discover_more_link}
-                    onChange={(e) => setServiceForm({ ...serviceForm, discover_more_link: e.target.value })}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="https://facebook.com/groups/YOUR_GROUP_ID"
-                  />
-                </div>
-              )}
-
-              {/* Order */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Display Order</label>
-                <input
-                  type="number"
-                  value={serviceForm.order}
-                  onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                />
+      {/* MODAL FORM */}
+      {showModal && (
+        <div className="fixed inset-0 z-[150] bg-black/95 backdrop-blur-3xl flex items-start sm:items-center justify-center p-0 sm:p-6 overflow-y-auto overflow-x-hidden">
+          <div className="bg-zinc-900 w-full max-w-4xl min-h-screen sm:min-h-0 sm:rounded-[50px] border-x sm:border border-white/10 shadow-2xl relative flex flex-col">
+            <div className="sticky top-0 bg-zinc-900/90 backdrop-blur-xl p-6 sm:p-10 border-b border-white/5 flex justify-between items-center z-20">
+              <div className="min-w-0">
+                <h2 className="text-2xl sm:text-3xl font-black italic uppercase tracking-tighter truncate">
+                  {editingId ? "Update Section" : "New Section"}
+                </h2>
+                <p className="text-[7px] sm:text-[9px] text-emerald-400 uppercase tracking-[3px] font-black mt-1">Configure Content Layout</p>
               </div>
+              <button onClick={() => setShowModal(false)} className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-white/5 hover:bg-white hover:text-black rounded-full flex items-center justify-center transition-all border border-white/10 ml-4">
+                <X size={20} />
+              </button>
+            </div>
 
-              {/* Save Button */}
-              <button
-                onClick={handleSaveService}
-                disabled={uploading}
-                className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+            <div className="p-6 sm:p-10 space-y-8 sm:space-y-10 flex-1 overflow-y-auto max-h-[calc(100vh-160px)] sm:max-h-[60vh] custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+                <div className="space-y-6 sm:space-y-8">
+                  <div className="bg-black/20 p-6 rounded-[30px] border border-white/5 space-y-6">
+                    <div>
+                      <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Section Type</label>
+                      <select 
+                        className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer"
+                        value={formData.type}
+                        onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      >
+                        <option value="split">Split (Image + Text)</option>
+                        <option value="full">Gallery (Horizontal Scroll)</option>
+                        <option value="verse">Verse of the Week</option>
+                        <option value="video">Live & Upcoming Streams</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Display Title</label>
+                      <input 
+                        type="text" 
+                        className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all"
+                        placeholder="e.g. Announcements"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Display Order</label>
+                      <input 
+                        type="number" 
+                        className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all"
+                        value={formData.order}
+                        onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6 sm:space-y-8">
+                  {formData.type === "split" && (
+                    <div className="bg-black/20 p-6 rounded-[30px] border border-white/5 space-y-6">
+                      <div>
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Description</label>
+                        <textarea 
+                          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all h-32 resize-none"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Section Image</label>
+                        <div className="flex flex-wrap items-center gap-4">
+                          <button 
+                            onClick={() => fileInputRef.current.click()}
+                            className="flex items-center gap-3 bg-white text-black px-5 py-3 rounded-xl font-black text-[8px] uppercase tracking-[1px] hover:scale-105 active:scale-95 transition-all"
+                          >
+                            <ImageIcon size={14} /> {uploading ? "..." : "Upload"}
+                          </button>
+                          <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleImageUpload(e, "image")} />
+                          {formData.image && <img src={formData.image} className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg" alt="" />}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.type === "full" && (
+                    <div className="bg-black/20 p-6 rounded-[30px] border border-white/5 space-y-6">
+                      <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Gallery Images</label>
+                      <button 
+                        onClick={() => galleryInputRef.current.click()}
+                        className="w-full border-2 border-dashed border-white/10 rounded-2xl py-8 flex flex-col items-center gap-2 hover:border-emerald-500/50 transition-all bg-black/40 group"
+                      >
+                        <ImageIcon size={24} className="text-white/20 group-hover:text-emerald-500/50 transition-colors" />
+                        <span className="text-[7px] font-black uppercase tracking-[1px] text-white/30">Add Photos</span>
+                      </button>
+                      <input type="file" ref={galleryInputRef} className="hidden" onChange={(e) => handleImageUpload(e, "images")} />
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
+                        {formData.images.map((img, i) => (
+                          <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-white/5">
+                            <img src={img} className="w-full h-full object-cover" alt="" />
+                            <button 
+                              onClick={() => setFormData({ ...formData, images: formData.images.filter((_, idx) => idx !== i) })}
+                              className="absolute inset-0 bg-red-600/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.type === "verse" && (
+                    <div className="bg-black/20 p-6 rounded-[30px] border border-white/5 space-y-6">
+                      <div>
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Bible Verse</label>
+                        <textarea 
+                          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all h-24 resize-none italic"
+                          placeholder="e.g. Philippians 4:13..."
+                          value={formData.verse}
+                          onChange={(e) => setFormData({ ...formData, verse: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Reference / Author</label>
+                        <input 
+                          type="text" 
+                          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.type === "video" && (
+                    <div className="space-y-6">
+                      <div className="bg-black/20 p-6 rounded-[30px] border border-white/5 space-y-6">
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Live Stream Cards</label>
+                        <div className="space-y-4">
+                          {formData.live_streams.map((stream, i) => (
+                            <div key={i} className="bg-black border border-white/10 p-5 rounded-[25px] space-y-4 relative group shadow-2xl">
+                              <button 
+                                onClick={() => setFormData({ ...formData, live_streams: formData.live_streams.filter((_, idx) => idx !== i) })}
+                                className="absolute top-4 right-4 text-white/20 hover:text-red-500 transition-all"
+                              >
+                                <X size={16} />
+                              </button>
+                              
+                              <div className="space-y-3">
+                                <input 
+                                  placeholder="Stream Title"
+                                  className="w-full bg-zinc-900 border border-white/5 rounded-lg px-3 py-2 text-[10px] outline-none focus:border-emerald-500"
+                                  value={stream.title}
+                                  onChange={(e) => {
+                                    const newStreams = [...formData.live_streams];
+                                    newStreams[i].title = e.target.value;
+                                    setFormData({ ...formData, live_streams: newStreams });
+                                  }}
+                                />
+                                <input 
+                                  placeholder="YouTube ID or FB URL"
+                                  className="w-full bg-zinc-900 border border-white/5 rounded-lg px-3 py-2 text-[10px] outline-none focus:border-emerald-500"
+                                  value={stream.youtube_id || stream.facebook_url || ""}
+                                  onChange={(e) => {
+                                    const newStreams = [...formData.live_streams];
+                                    if (e.target.value.includes("facebook.com")) {
+                                      newStreams[i].facebook_url = e.target.value;
+                                      delete newStreams[i].youtube_id;
+                                    } else {
+                                      newStreams[i].youtube_id = e.target.value;
+                                      delete newStreams[i].facebook_url;
+                                    }
+                                    setFormData({ ...formData, live_streams: newStreams });
+                                  }}
+                                />
+                                <input 
+                                  placeholder="Schedule (e.g. Every Sunday • 9AM)"
+                                  className="w-full bg-zinc-900 border border-white/5 rounded-lg px-3 py-2 text-[10px] outline-none focus:border-emerald-500"
+                                  value={stream.schedule}
+                                  onChange={(e) => {
+                                    const newStreams = [...formData.live_streams];
+                                    newStreams[i].schedule = e.target.value;
+                                    setFormData({ ...formData, live_streams: newStreams });
+                                  }}
+                                />
+                                <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border border-white/5 rounded-lg">
+                                  <span className="text-[8px] font-black uppercase tracking-[1px] text-white/30">Live Badge?</span>
+                                  <input 
+                                    type="checkbox"
+                                    checked={stream.is_live}
+                                    onChange={(e) => {
+                                      const newStreams = [...formData.live_streams];
+                                      newStreams[i].is_live = e.target.checked;
+                                      setFormData({ ...formData, live_streams: newStreams });
+                                    }}
+                                    className="w-4 h-4 accent-red-600 cursor-pointer"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-3 pt-2">
+                                  <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 bg-white/5 border border-white/5 px-3 py-2 rounded-lg hover:bg-white/10 transition-all">
+                                    <ImageIcon size={12} className="text-white/30" />
+                                    <span className="text-[8px] font-black uppercase tracking-[1px]">Cover</span>
+                                    <input 
+                                      type="file" 
+                                      className="hidden" 
+                                      onChange={(e) => handleStreamCoverUpload(e, i)}
+                                    />
+                                  </label>
+                                  {stream.cover_image && (
+                                    <img src={stream.cover_image} className="w-8 h-8 rounded-lg object-cover border border-white/10" alt="" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          <button 
+                            onClick={() => setFormData({ ...formData, live_streams: [...formData.live_streams, { title: "", youtube_id: "", schedule: "", is_live: false }] })}
+                            className="w-full py-4 border border-dashed border-white/10 rounded-2xl text-[8px] font-black uppercase tracking-[2px] text-white/20 hover:text-white hover:bg-white/5 transition-all"
+                          >
+                            + Add Stream
+                          </button>
+                        </div>
+                      </div>
+                      <div className="bg-black/20 p-6 rounded-[30px] border border-white/5">
+                        <label className="text-[8px] font-black uppercase tracking-[2px] text-white/30 block mb-2">Discover More Link</label>
+                        <input 
+                          type="text" 
+                          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none transition-all"
+                          placeholder="https://facebook.com/groups/..."
+                          value={formData.discover_more_link}
+                          onChange={(e) => setFormData({ ...formData, discover_more_link: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-zinc-900/90 backdrop-blur-xl p-6 sm:p-10 border-t border-white/5 sm:rounded-b-[50px] z-20">
+              <button 
+                onClick={handleSaveRequest}
+                disabled={loading}
+                className="w-full bg-white text-black font-black uppercase tracking-[3px] sm:tracking-[4px] py-5 sm:py-6 rounded-2xl sm:rounded-3xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 text-[10px] sm:text-xs"
               >
-                <Save size={20} /> {editingService ? 'Update Service' : 'Create Service'}
+                <Save size={20} className="sm:w-6 sm:h-6" /> {editingId ? "Update Section" : "Save Section"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ==================== PROJECT MODAL ==================== */}
-      {showProjectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-zinc-900 rounded-3xl border border-zinc-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-6 flex justify-between items-center">
-              <h2 className="text-2xl font-bold">{editingProject ? 'Edit Project' : 'Add New Project'}</h2>
-              <button
-                onClick={() => setShowProjectModal(false)}
-                className="text-zinc-400 hover:text-white transition"
-              >
-                <X size={28} />
-              </button>
+      {/* ACTION GATE MODAL */}
+      {showGate && (
+        <div className="fixed inset-0 z-[250] bg-black/98 flex items-center justify-center p-4 sm:p-6 backdrop-blur-3xl">
+          <div className="w-full max-w-md bg-zinc-900 p-8 sm:p-12 rounded-[40px] sm:rounded-[50px] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center relative">
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center shadow-2xl border-4 border-black">
+              <Key size={32} className="text-black" />
             </div>
-
-            <div className="p-6 space-y-6">
-              {/* Project Name */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Project Name</label>
-                <input
-                  type="text"
-                  value={projectForm.name}
-                  onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                  placeholder="Enter project name"
-                />
-              </div>
-
-              {/* Project Description */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
-                <textarea
-                  value={projectForm.description}
-                  onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500 resize-none"
-                  rows="4"
-                  placeholder="Enter project description"
-                />
-              </div>
-
-              {/* Project Image */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Project Image</label>
-                <div className="flex gap-3">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const url = await uploadImage(e.target.files[0]);
-                      if (url) setProjectForm({ ...projectForm, image: url });
-                    }}
-                    disabled={uploading}
-                    className="flex-1"
-                  />
-                  {projectForm.image && (
-                    <img src={projectForm.image} alt="preview" className="w-16 h-16 object-cover rounded-lg" />
-                  )}
-                </div>
-              </div>
-
-              {/* Background Image */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Background Image</label>
-                <div className="flex gap-3">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const url = await uploadImage(e.target.files[0]);
-                      if (url) setProjectForm({ ...projectForm, bg_image: url });
-                    }}
-                    disabled={uploading}
-                    className="flex-1"
-                  />
-                  {projectForm.bg_image && (
-                    <img src={projectForm.bg_image} alt="bg-preview" className="w-16 h-16 object-cover rounded-lg" />
-                  )}
-                </div>
-              </div>
-
-              {/* Frameworks */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Team Members / Frameworks</label>
-                <div className="space-y-2 mb-3">
-                  {projectForm.frameworks?.map((fw, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={fw.name}
-                        onChange={(e) => {
-                          const newFw = [...projectForm.frameworks];
-                          newFw[idx].name = e.target.value;
-                          setProjectForm({ ...projectForm, frameworks: newFw });
-                        }}
-                        className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-                      />
-                      <button
-                        onClick={() => {
-                          setProjectForm({
-                            ...projectForm,
-                            frameworks: projectForm.frameworks.filter((_, i) => i !== idx),
-                          });
-                        }}
-                        className="text-red-400 hover:text-red-300 transition"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    setProjectForm({
-                      ...projectForm,
-                      frameworks: [...(projectForm.frameworks || []), { id: Date.now(), name: '' }],
-                    });
-                  }}
-                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg transition text-sm"
+            <h3 className="text-2xl sm:text-3xl font-black italic uppercase tracking-tighter mb-2 mt-8">Authorize {gateType.toUpperCase()}</h3>
+            <p className="text-white/40 text-[8px] sm:text-[9px] mb-8 leading-relaxed uppercase tracking-[3px] font-bold">Security Verification Required</p>
+            <form onSubmit={verifyGate} className="space-y-4 sm:space-y-6">
+              <input
+                type="password"
+                placeholder="Enter Security Code"
+                className="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 sm:py-5 focus:border-emerald-500 outline-none transition-all text-center text-lg sm:text-xl tracking-widest"
+                value={gatePassword}
+                onChange={(e) => setGatePassword(e.target.value)}
+                autoFocus
+              />
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-[3px] py-4 sm:py-5 rounded-2xl hover:scale-105 active:scale-95 transition-all text-[10px]">
+                  Confirm
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => { setShowGate(false); setGatePassword(""); setGateType(null); setPendingAction(null); }}
+                  className="px-6 py-4 sm:py-5 border border-white/10 rounded-2xl text-[9px] font-black uppercase tracking-[2px] hover:bg-white/5 transition-all"
                 >
-                  + Add Team Member
+                  Abort
                 </button>
               </div>
-
-              {/* Order */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Display Order</label>
-                <input
-                  type="number"
-                  value={projectForm.order}
-                  onChange={(e) => setProjectForm({ ...projectForm, order: parseInt(e.target.value) })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Save Button */}
-              <button
-                onClick={handleSaveProject}
-                disabled={uploading}
-                className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-white/90 transition disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                <Save size={20} /> {editingProject ? 'Update Project' : 'Create Project'}
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}

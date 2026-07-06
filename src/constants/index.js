@@ -56,7 +56,7 @@ export const projects = [
       "One big family in Christ. Pastors, leaders, teens, and volunteers united in faith, worship, and purpose at Mustard Seed Church Ikeja.",
     href: "",
     image: "/assets/projects/gallery1.jpg",
-    bgImage: "/assets/backgrounds/blanket.jpg",
+    bgImage: "/assets/backgrounds/newbg.jpg",
     frameworks: [
       { id: 1, name: "Leaders" },
     { id: 2, name: "Teens" },
@@ -110,11 +110,8 @@ export const projects = [
 },
 ];
 export const socials = [
-  { name: "Instagram", href: "https://www.instagram.com/ali.sanatidev/reels/" },
-  {
-    name: "Youtube",
-    href: "https://www.youtube.com/channel/UCZhtUWTtk3bGJiMPN9T4HWA",
-  },
-  { name: "LinkedIn", href: "https://www.linkedin.com/in/ali-sanati/" },
-  { name: "GitHub", href: "https://github.com/Ali-Sanati" },
+  { name: "Instagram", href: "https://www.instagram.com/mustardseedchurch/" },
+  { name: "Facebook", href: "https://www.facebook.com/61570565155976/" },
+  { name: "Youtube", href: "https://www.youtube.com/@agikeja" },
+  { name: "Contact", href: "#contact" },
 ];

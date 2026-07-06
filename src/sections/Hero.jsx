@@ -1,114 +1,105 @@
-import { useMediaQuery } from "react-responsive";
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 const Hero = () => {
-  const isMobile = useMediaQuery({ maxWidth: 853 });
+  const containerRef = useRef(null);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline();
+
+      // Initial State
+      gsap.set(".hero-element", { opacity: 0, y: 20 });
+      gsap.set(".hero-title", { opacity: 0, y: 30, skewY: 2 });
+
+      tl.to(".hero-title", {
+        opacity: 1,
+        y: 0,
+        skewY: 0,
+        duration: 1.5,
+        stagger: 0.2,
+        ease: "power3.out"
+      })
+      .to(".hero-element", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power2.out"
+      }, "-=1");
+    },
+    { scope: containerRef }
+  );
 
   return (
-    <section id="home" className="hero-section relative h-dvh w-full overflow-hidden text-white">
-
-      {/* 🔥 BACKGROUND TEXTURE */}
-      <div
-        className="absolute inset-0 -z-50 bg-cover bg-center opacity-60"
-        style={{
-          backgroundImage: "url('/bg-texture.png')",
-          filter: "contrast(120%) brightness(90%)",
-        }}
-      />
-
-      {/* 🔥 DARK OVERLAY */}
-      <div className="absolute inset-0 bg-black/90 -z-40" />
-
-      {/* 🎯 EXTRA NOISE GRAIN */}
-      <div
-        className="absolute inset-0 -z-30 pointer-events-none"
-        style={{ backgroundImage: "url('/bg-texture.png')" }}
-      />
-
-      {/* Leaves - Perfect for "Growth" Theme */}
-      <img
-        src="/leaf-left.png"
-        alt="leaf"
-        className={`absolute w-[180px] sm:w-[220px] md:w-[300px] transition-all duration-500
-          ${isMobile 
-            ? "-left-12 top-[10%]" 
-            : "-left-[3%] top-[60%] -translate-y-1/2 rotate-[20deg]"
-          }`}
-        loading="eager"
-      />
-
-      <img
-        src="/leaf-right.png"
-        alt="leaf"
-        className={`absolute w-[180px] sm:w-[220px] md:w-[300px] opacity-90 transition-all duration-500
-          ${isMobile
-            ? "-right-12 top-[15%] rotate-[15deg]"
-            : "-right-[4%] top-[40%] -translate-y-1/2 -rotate-[35deg] scale-95 opacity-80"
-          }`}
-        loading="eager"
-      />
-
-      {/* Tree Element - Mustard Seed Tree of Faith */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[-35]">
-        <img
-          src="/tree.png"
-          alt="Mustard Seed Tree of Faith"
-          className={`
-            absolute left-1/2 -translate-x-1/2 
-            object-contain pointer-events-none
-            ${isMobile 
-              ? "top-[56%] w-[380px] -translate-y-1/2"     
-              : "top-[70%] -translate-y-1/2 w-[900px] md:w-[1200px] lg:w-[650px]"
-            }
-          `}
-          loading="eager"
-        />
+    <section
+      id="home"
+      ref={containerRef}
+      className="relative h-screen w-full overflow-hidden bg-black text-white flex flex-col justify-center items-center px-6 sm:px-12"
+    >
+      {/* 🎬 VIDEO BACKGROUND */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-40 grayscale contrast-125 brightness-75"
+        >
+          <source src="/videos/program.mp4" type="video/mp4" />
+        </video>
+        {/* Cinematic Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
       </div>
 
-      {/* BIG TITLE - Church Branding */}
-      <h1
-        className="
-          font-[Bodoni_Moda]
-          absolute top-[32%] sm:top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 
-          text-[42px] sm:text-[52px] md:text-[88px] lg:text-[89px]
-          font-black
-          tracking-[0.30em]
-          text-center
-          px-4
-          bg-gradient-to-b from-white via-white to-gray-400
-          bg-clip-text text-transparent
-          leading-[0.95]
-        "
-      >
-        MUSTARD SEED<br />CHURCH
-      </h1>
+      {/* Main Content */}
+      <div className="relative z-10 text-center max-w-5xl mx-auto space-y-10">
+        <div className="hero-element inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-2xl mb-6">
+          <Sparkles size={12} className="text-emerald-400" />
+          <span className="text-[9px] font-black uppercase tracking-[6px] text-white/70">Teens Arm of AG Ikeja</span>
+        </div>
 
-      {/* Left Text Block - Powerful & Inspirational */}
-      <div className="absolute left-4 md:left-6 bottom-64 md:bottom-24 max-w-[240px] md:max-w-[280px]">
-        <h2 className="text-[22px] md:text-4xl font-serif leading-tight text-[#e6d3a3]">
-          Where Small Seeds<br />Become Mighty Oaks
-        </h2>
-        <p className="mt-4 text-sm text-white/80 leading-relaxed">
-          Ikeja, Lagos
-        </p>
+        <h1 className="hero-title font-black italic uppercase tracking-[-0.02em] leading-[0.9] text-5xl sm:text-7xl md:text-[100px] lg:text-[120px]">
+          Mustard <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">Seed Church</span>
+        </h1>
+
+        <div className="hero-element flex flex-col items-center gap-12 pt-12">
+          <div className="space-y-4 max-w-2xl mt-[-50px]">
+            <h2 className="text-2xl sm:text-3xl font-black italic uppercase tracking-tighter text-emerald-400 leading-none">
+              Where Small Seeds Become Mighty Giants.
+            </h2>
+            <p className="text-white/40 text-sm sm:text-md font-light leading-relaxed">
+              Experience explosive worship and deep word in a community designed for the next generation of Kingdom leaders.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center mt-[-24px] gap-8 w-full">
+            <a
+              href="#services"
+              className="group relative flex items-center gap-4 bg-white text-black px-12 py-5 rounded-full font-black text-[10px] tracking-[5px] uppercase hover:scale-105 transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+            >
+              Enter The Encounter
+              <ArrowRight size={18} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />
+            </a>
+            
+            <div className="flex items-center mt-13 gap-6 text-white/20 text-[9px] font-black uppercase tracking-[4px]">
+              <span>Ikeja, Lagos</span>
+              <div className="w-8 h-[1px] bg-white/10" />
+              <span>Assemblies of God</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Right Text Block - Engaging CTA */}
-      <div className="absolute right-4 md:right-6 bottom-16 md:bottom-24 max-w-[240px] md:max-w-[280px] text-right">
-        <p className="text-sm text-white/70 mb-5 leading-relaxed">
-          A vibrant Teens Ministry where faith is planted, worship is explosive, 
-          and young destinies are raised to shine for Jesus Christ.
-        </p>
-<a
-  href="#services"
-  className="cta-button"
->
-  <span className="cta-glow"></span>
-  <span className="cta-text">
-    Want to know more about us?
-  </span>
-</a>
+      {/* Scroll Indicator */}
+      <div className="hero-element absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/20">
+        <span className="text-[8px] font-black uppercase tracking-[5px]">Explore</span>
+        <div className="w-[1px] h-12 bg-gradient-to-b from-white/20 to-transparent animate-pulse" />
       </div>
-
     </section>
   );
 };

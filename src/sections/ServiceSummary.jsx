@@ -1,104 +1,106 @@
+import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/all";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const ServiceSummary = () => {
-  useGSAP(() => {
-    const scrubSpeed = 14;
+  const containerRef = useRef(null);
 
-    gsap.to("#title-service-1", {
-      xPercent: 20,
-      scrollTrigger: {
-        trigger: "#title-service-1",
-        scrub: scrubSpeed,
-      },
-    });
+  useGSAP(
+    () => {
+      // Smooth Horizontal Scrolling for the large background text
+      gsap.to(".scrolling-text-1", {
+        xPercent: 30,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        }
+      });
 
-    gsap.to("#title-service-2", {
-      xPercent: -30,
-      scrollTrigger: {
-        trigger: "#title-service-2",
-        scrub: scrubSpeed,
-      },
-    });
+      gsap.to(".scrolling-text-2", {
+        xPercent: -30,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        }
+      });
 
-    gsap.to("#title-service-3", {
-      xPercent: 100,
-      scrollTrigger: {
-        trigger: "#title-service-3",
-        scrub: scrubSpeed,
-      },
-    });
-
-    gsap.to("#title-service-4", {
-      xPercent: -100,
-      scrollTrigger: {
-        trigger: "#title-service-4",
-        scrub: scrubSpeed,
-      },
-    });
-  });
+      // Reveal animation for the central content
+      gsap.from(".summary-content", {
+        opacity: 0,
+        y: 50,
+        duration: 1.5,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 60%",
+        }
+      });
+    },
+    { scope: containerRef }
+  );
 
   return (
-    <section className="relative w-full bg-black overflow-hidden pb-6">
-      {/* 🌑 STATIC BACKGROUND */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-b-[30px] lg:rounded-b-[40px]">
-        {/* Main Dark Black Background */}
-        <div className="absolute inset-0 bg-[#0a0a0a]" />
-
-        {/* Noise Overlay with Bottom Border Radius */}
-        <div
-          className="absolute inset-0 opacity-50 mix-blend-overlay rounded-b-[30px] lg:rounded-b-[40px]"
-          style={{
-            backgroundImage: "url('/bg-texture.png')",
-            backgroundSize: "cover",
-          }}
+    <section
+      ref={containerRef}
+      className="relative w-full bg-black overflow-hidden py-32 sm:py-56 flex items-center justify-center"
+    >
+      {/* 🌳 STATIC TREE BACKGROUND */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+        <img
+          src="/tree.png"
+          alt="Mustard Seed Tree"
+          className="w-[800px] md:w-[1200px] lg:w-[1400px] object-contain"
         />
+      </div>
 
-        {/* Second Noise Layer */}
-        <div
-          className="absolute inset-0 rounded-b-[60px] lg:rounded-b-[30px]"
-          style={{
-            backgroundImage: "url('/bg-texture.png')",
-          }}
-        />
+      {/* Cinematic Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)] z-10" />
 
-        {/* 🌳 CENTER TREE - Symbol of Mustard Seed Growth */}
-        <div className="absolute inset-0 hidden lg:flex items-center justify-center">
-          <img
-            src="/tree.png"
-            alt="Mustard Seed Tree of Faith"
-            className="absolute left-1/2 -top-[26.5%] -translate-x-1/2 -translate-y-1/2
-                       w-[900px] md:w-[1200px] lg:w-[650px] object-contain pointer-events-none"
-          />
+      {/* 🌪️ SCROLLING TEXT LAYERS (Background) */}
+      <div className="absolute inset-0 flex flex-col justify-center gap-20 sm:gap-32 opacity-5 pointer-events-none z-0">
+        <div className="scrolling-text-1 whitespace-nowrap text-[120px] sm:text-[250px] font-black italic uppercase tracking-tighter leading-none">
+          Worship Prayer Word Fellowship Impact Worship Prayer Word Fellowship Impact
+        </div>
+        <div className="scrolling-text-2 whitespace-nowrap text-[120px] sm:text-[250px] font-black italic uppercase tracking-tighter leading-none">
+          Growth Vision Faith Purpose Power Growth Vision Faith Purpose Power
         </div>
       </div>
 
-      {/* 🔥 CONTENT - Church Themed */}
-      <div className="relative z-10 mt-20 mb-42 overflow-hidden font-light leading-snug text-center contact-text-responsive text-white">
-        <div id="title-service-1">
-          <p>Worship</p>
+      {/* 🎯 MAIN CONTENT (High Contrast) */}
+      <div className="summary-content relative z-20 text-center max-w-4xl px-6 space-y-12">
+        <div className="space-y-4">
+          <span className="text-emerald-400 text-[10px] sm:text-[12px] tracking-[8px] sm:tracking-[10px] uppercase font-black block">The Core Pillars</span>
+          <h2 className="text-5xl sm:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] text-white">
+            Worship. Word. <br/> <span className="text-white/40">Impact.</span>
+          </h2>
         </div>
 
-        <div id="title-service-2" className="flex items-center justify-center gap-3 translate-x-16">
-          <p className="font-normal">Prayer</p>
-          <div className="w-10 h-1 md:w-32 bg-gold" />
-          <p>Word</p>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-[1px] bg-emerald-500/50" />
+            <p className="text-xl sm:text-2xl font-black text-white italic uppercase tracking-tighter">Prayer</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-[1px] bg-emerald-500/50" />
+            <p className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-emerald-400">Fellowship</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-[1px] bg-emerald-500/50" />
+            <p className="text-xl sm:text-2xl font-black text-white italic uppercase tracking-tighter">Growth</p>
+          </div>
         </div>
 
-        <div id="title-service-3" className="flex items-center justify-center gap-3 -translate-x-48">
-          <p>Fellowship</p>
-          <div className="w-10 h-1 md:w-32 bg-gold" />
-          <p className="italic">Evangelism</p>
-          <div className="w-10 h-1 md:w-32 bg-gold" />
-          <p>Discipleship</p>
-        </div>
-
-        <div id="title-service-4" className="translate-x-48">
-          <p>Impact</p>
-        </div>
+        <p className="text-white/40 text-base sm:text-xl font-light max-w-2xl mx-auto leading-relaxed">
+          We are more than a ministry; we are a movement dedicated to raising a generation that is unashamed of the Gospel.
+        </p>
       </div>
     </section>
   );
