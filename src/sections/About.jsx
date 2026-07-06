@@ -161,7 +161,7 @@ const About = () => {
                   In the heart of Ikeja, a small group of teenagers began to meet. They were looking for more than just a Sunday routine; they were looking for a home, a purpose, and a real connection with God.
                 </p>
 <p className="story-para opacity-100">
-  What began as a simple gathering of seeds soon blossomed into an <strong>Explosive Encounter</strong>. Under the leadership of the Late Barrister Ben Ukadike, alongside faithful pioneers such as Reverend Emma Ossai, James and Mrs. Chichi Okereke, Deacon Patrick Ajah and Deaconess Cynthia Ajah, Mr. and Mrs. Omobare, and Mr. and Mrs. John Obasi Kalu, among many others, <strong>The Mustard Seed Church (MSC)</strong> was birthed with a singular, burning vision: <em>to sow seeds of faith and raise giants for the Kingdom of God.</em>
+  What began as a simple gathering of seeds soon blossomed into an <strong>Explosive Encounter</strong>. Under the leadership of the Late Barrister Ben Ukadike, alongside faithful pioneers such as Reverend Emma Ossai, Pastor James and Mrs. Chichi Okereke, Deacon Patrick Ajah and Deaconess Cynthia Ajah, Mr. and Mrs. Omobare, and Mr. and Mrs. John Obasi Kalu, among many others, <strong>The Mustard Seed Church (MSC)</strong> was birthed with a singular, burning vision: <em>to sow seeds of faith and raise giants for the Kingdom of God.</em>
 </p>
                 <p className="story-para opacity-100">
                   Today, MSC stands as a vibrant beacon of hope within Assemblies of God Ikeja. We are a generation that refuses to be silent, a movement that is rewriting the narrative of what it means to be a Christian teenager in the modern world.
