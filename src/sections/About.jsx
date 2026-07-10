@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Flame, Users, BookOpen, Heart, Shield, Star, Zap, Anchor } from "lucide-react";
+import { Flame, Users, BookOpen, Shield, Star, Zap, Anchor } from "lucide-react";
 import AnimatedHeaderSection from "../components/AnimatedHeaderSection";
 import Marquee from "../components/Marquee";
 
@@ -11,6 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 const About = () => {
   const containerRef = useRef(null);
   const pillarsRef = useRef(null);
+  const orbitContainerRef = useRef(null);
+  const orbitRefs = useRef([]);
 
   const items = [
     "Mustard Seed Church",
@@ -20,111 +22,69 @@ const About = () => {
     "Join Us",
     "You're Welcome",
   ];
-
-  const pillars = [
-    { 
-      icon: Flame, 
-      title: "Anointed Worship", 
-      desc: "We believe worship is not just music; it's an encounter. Our atmosphere is charged with the presence of God, where teens find freedom to express their love for the Father.",
-      color: "text-orange-500"
-    },
-    { 
-      icon: BookOpen, 
-      title: "The Uncompromised Word", 
-      desc: "We dig deep into the scriptures, teaching the Bible in a way that is relevant, practical, and life-transforming for the 21st-century teenager.",
-      color: "text-emerald-500"
-    },
-    { 
-      icon: Users, 
-      title: "Radical Fellowship", 
-      desc: "Nobody walks alone. We are a family of believers where accountability, friendship, and genuine love form the foundation of our community.",
-      color: "text-blue-500"
-    },
-    { 
-      icon: Zap, 
-      title: "Purposeful Living", 
-      desc: "We don't just gather; we are sent. We empower teens to discover their God-given talents and use them to shine as lights in their schools and homes.",
-      color: "text-yellow-500"
-    },
+  const orbitImages = [
+    "/images/orbit1.jpg",
+    "/images/orbit2.jpg",
+    "/images/orbit3.jpg",
+    "/images/orbit4.jpg",
+    "/images/orbit5.jpg",
+    "/images/orbit6.jpg",
+    "/images/orbit7.jpg",
+    "/images/orbit8.jpg",
   ];
 
-  useGSAP(
-    () => {
-      // 1. Smooth Section Reveal
-      gsap.from(".section-reveal", {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".section-reveal",
-          start: "top 90%",
-          toggleActions: "play none none none"
-        }
-      });
+  const pillars = [
+    { icon: Flame, title: "Anointed Worship", desc: "...", color: "text-orange-500" },
+    { icon: BookOpen, title: "The Uncompromised Word", desc: "...", color: "text-emerald-500" },
+    { icon: Users, title: "Radical Fellowship", desc: "...", color: "text-blue-500" },
+    { icon: Zap, title: "Purposeful Living", desc: "...", color: "text-yellow-500" },
+  ];
 
-      // 2. Story Paragraphs Reveal
-      gsap.utils.toArray(".story-para").forEach((para) => {
-        gsap.from(para, {
-          opacity: 0,
-          y: 20,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: para,
-            start: "top 90%",
-            toggleActions: "play none none none"
-          }
+
+  // Orbit Animation - Responsive
+  useGSAP(() => {
+    const updateOrbit = () => {
+      const isMobile = window.innerWidth < 640;
+      const radius = isMobile ? 130 : 210;   // Smaller on mobile
+
+      orbitRefs.current.forEach((circle, i) => {
+        if (!circle) return;
+
+        const angle = (i * (360 / 8));
+
+        gsap.set(circle, {
+          left: "50%",
+          top: "50%",
+          x: Math.cos((angle * Math.PI) / 180) * radius - (isMobile ? 38 : 50),
+          y: Math.sin((angle * Math.PI) / 180) * radius - (isMobile ? 38 : 50),
         });
       });
+    };
 
-      // 3. Pillar Cards - Force Visibility & Stable Animation
-      gsap.from(".pillar-card", {
-        scale: 0.9,
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: pillarsRef.current,
-          start: "top 90%",
-          toggleActions: "play none none none",
-          onEnter: () => {
-            // Force final state just in case
-            gsap.to(".pillar-card", { opacity: 1, y: 0, scale: 1, stagger: 0.1 });
-          }
-        }
-      });
+    // Initial setup
+    updateOrbit();
 
-      // 4. Image Mask Animation
-      gsap.from(".image-mask", {
-        clipPath: "inset(0 100% 0 0)",
-        duration: 1.5,
-        ease: "power4.inOut",
-        scrollTrigger: {
-          trigger: ".image-mask",
-          start: "top 80%",
-          toggleActions: "play none none none"
-        }
-      });
+    // Update on resize
+    window.addEventListener("resize", updateOrbit);
 
-      // 5. Floating Elements
-      gsap.to(".float-item", {
-        y: -15,
-        duration: 2,
+    // Rotation animation
+    orbitRefs.current.forEach((circle, i) => {
+      if (!circle) return;
+      gsap.to(circle, {
+        rotation: 360,
+        duration: 28 + i * 2,
         repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        stagger: 0.5
+        ease: "none",
       });
-    },
-    { scope: containerRef }
-  );
+    });
+
+    return () => window.removeEventListener("resize", updateOrbit);
+  }, []);
 
   return (
     <div ref={containerRef} className="bg-black text-white font-sans overflow-x-hidden">
       
-      {/* --- HERO SECTION --- */}
+      {/* HERO SECTION */}
       <section id="about" className="relative min-h-screen flex flex-col justify-center px-6 sm:px-10 py-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
         
@@ -140,18 +100,42 @@ const About = () => {
           </div>
 
           <div className="mt-20 grid lg:grid-cols-2 gap-16 items-center">
-            <div className="relative group section-reveal">
-              <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[60px] blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
-              <div className="relative image-mask aspect-[4/5] rounded-[60px] overflow-hidden border border-white/10 shadow-2xl">
-                <img src="/images/man.jpg" alt="MSC Leadership" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-10 left-10">
-                  <p className="text-[10px] font-black uppercase tracking-[5px] text-emerald-400 mb-2">The Founder's Vision</p>
-                  <h4 className="text-3xl font-black italic uppercase tracking-tighter">Late Prince Barrister Ben Ukadike</h4>
+            
+            {/* ANIMATED ORBIT SECTION */}
+            {/* ANIMATED ORBIT SECTION - RESPONSIVE */}
+            <div className="relative flex justify-center section-reveal">
+              <div 
+                className="relative w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[460px] md:h-[460px]" 
+                ref={orbitContainerRef}
+              >
+                {/* Central Image */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-8 sm:border-[12px] border-white/20 shadow-2xl z-20">
+                  <img 
+                    src="/images/man.jpg" 
+                    alt="MSC Leadership" 
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/70 rounded-full" />
                 </div>
+
+                {/* Orbiting Images */}
+                {orbitImages.map((src, i) => (
+                  <div
+                    key={i}
+                    ref={(el) => { if (el) orbitRefs.current[i] = el; }}
+                    className="absolute w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white/30 shadow-xl"
+                  >
+                    <img 
+                      src={src} 
+                      alt={`Member ${i}`} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
+            {/* Text Content */}
             <div className="space-y-10">
               <h3 className="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter leading-[0.85] text-white/90 section-reveal">
                 It Started as a <br/> <span className="text-emerald-400">Gathering...</span>
@@ -161,7 +145,7 @@ const About = () => {
                   In the heart of Ikeja, a small group of teenagers began to meet. They were looking for more than just a Sunday routine; they were looking for a home, a purpose, and a real connection with God.
                 </p>
 <p className="story-para opacity-100">
-  What began as a simple gathering of seeds soon blossomed into an <strong>Explosive Encounter</strong>. Under the leadership of the Late Barrister Ben Ukadike, alongside faithful pioneers such as Reverend Emma Ossai, Pastor James and Mrs. Chichi Okereke, Deacon Patrick Ajah and Deaconess Cynthia Ajah, Mr. and Mrs. Omobare, and Mr. and Mrs. John Obasi Kalu, among many others, <strong>The Mustard Seed Church (MSC)</strong> was birthed with a singular, burning vision: <em>to sow seeds of faith and raise giants for the Kingdom of God.</em>
+  What began as a simple gathering of seeds soon blossomed into an <strong>Explosive Encounter</strong>. Under the leadership of the <strong>Late Barrister Ben Ukadike</strong>, alongside faithful pioneers such as <strong>Reverend Emma Ossai</strong>, Pastor James and Mrs. Chichi Okereke, Deacon Patrick Ajah and Deaconess Cynthia Ajah, Mrs Stella Chamberlain, Mr. and Mrs. Omobare, and Mr. and Mrs. John Obasi Kalu, among many others, <strong>The Mustard Seed Church (MSC)</strong> was birthed with a singular, burning vision: <em>to sow seeds of faith and raise giants for the Kingdom of God.</em>
 </p>
                 <p className="story-para opacity-100">
                   Today, MSC stands as a vibrant beacon of hope within Assemblies of God Ikeja. We are a generation that refuses to be silent, a movement that is rewriting the narrative of what it means to be a Christian teenager in the modern world.
@@ -172,7 +156,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* --- THE MISSION DEEP DIVE --- */}
+    {/* --- THE MISSION DEEP DIVE --- */}
       <section className="relative py-24 px-6 sm:px-10 bg-zinc-900/30">
         <div className="max-w-5xl mx-auto text-center space-y-16">
           <div className="space-y-6 section-reveal">
@@ -268,8 +252,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* Footer-like Marquee */}
-      <Marquee items={items} className="text-white/10 bg-transparent border-t border-white/5 py-16" />
     </div>
   );
 };

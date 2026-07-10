@@ -73,7 +73,7 @@ export const projects = [
   bgImage: "/assets/backgrounds/bgcoordinators.jpg",
   frameworks: [
     { id: 1, name: "Pastor Oreva Ogbor" },
-    { id: 2, name: "Lagos District Teens Coordinator" },
+    { id: 2, name: "AG Ikeja sectional Teens Coordinator" },
   ],
 },
 {
@@ -90,8 +90,22 @@ export const projects = [
     { id: 3, name: "Teens Ministry" },
   ],
 },
-  {
+{
   id: 4,
+  name: "Lead Coordinator",
+  description:
+    "A passionate and dedicated leader helping to guide and coordinate the Teens Ministry with commitment and excellence.",
+  href: "",
+  image: "/assets/projects/sunday.jpg",
+  bgImage: "/assets/backgrounds/oldbg.jpg",
+  frameworks: [
+    { id: 1, name: "Bro Sunday Adagbon" },
+    { id: 2, name: "Teens Coordinator" },
+    { id: 3, name: "Teens Ministry" },
+  ],
+},
+  {
+  id: 5,
   name: "Teen Coordinators",
   description:
     "A committed team of leaders and volunteers helping to nurture and raise teenagers in the fear and knowledge of God.",
