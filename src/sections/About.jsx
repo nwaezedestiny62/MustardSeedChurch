@@ -245,7 +245,7 @@ const About = () => {
             <a href="#contact" className="w-full sm:w-auto bg-white text-black px-10 py-5 rounded-full font-black text-xs tracking-[4px] uppercase hover:scale-105 transition-all shadow-2xl">
               Join the Family
             </a>
-            <a href="#services" className="w-full sm:w-auto border border-white/10 px-10 py-5 rounded-full font-black text-xs tracking-[4px] uppercase hover:bg-white/5 transition-all">
+            <a href="#weekly buzz" className="w-full sm:w-auto border border-white/10 px-10 py-5 rounded-full font-black text-xs tracking-[4px] uppercase hover:bg-white/5 transition-all">
               Our Programs
             </a>
           </div>

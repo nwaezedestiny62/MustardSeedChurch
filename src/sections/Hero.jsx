@@ -79,7 +79,7 @@ const Hero = () => {
 
           <div className="flex flex-col items-center mt-[-24px] gap-8 w-full">
             <a
-              href="#services"
+              href="#weekly buzz" 
               className="group relative flex items-center gap-4 bg-white text-black px-12 py-5 rounded-full font-black text-[10px] tracking-[5px] uppercase hover:scale-105 transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)]"
             >
               Enter The Encounter

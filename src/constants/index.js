@@ -128,4 +128,5 @@ export const socials = [
   { name: "Facebook", href: "https://www.facebook.com/61570565155976/" },
   { name: "Youtube", href: "https://www.youtube.com/@agikeja" },
   { name: "Contact", href: "#contact" },
+  { name: "weekly buzz", href: "#weekly buzz" }
 ];
