@@ -64,17 +64,17 @@ const ServiceSummary = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.18)_0%,transparent_65%)] z-10" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_40%,rgba(245,158,11,0.12)_0%,transparent_60%)] z-10" />
         
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-          src="/videos/opalfeed-bg.mp4" 
-          onError={(e) => {
-            e.target.style.display = 'none';
-          }}
-        />
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  onLoadedMetadata={(e) => {
+    e.target.playbackRate = 3;
+  }}
+  className="w-full h-full object-cover"
+  src="/videos/opalfeed-bg.mp4"
+/>
       </div>
 
       {/* TOP MARQUEE */}
@@ -93,7 +93,7 @@ const ServiceSummary = () => {
         {/* LAUNCH BADGE */}
         <div className="mb-8 flex items-center gap-3 bg-amber-500/10 border border-amber-400/30 px-6 py-2 rounded-full backdrop-blur-xl">
           <Calendar size={12} className="text-white" />
-          <span className="text-[8px] font-black uppercase tracking-[4px] text-white/70">Launching January 2027!</span>
+          <span className="text-[8px] font-black uppercase tracking-[4px] text-white/70">Launching January 2027</span>
         </div>
 
         {/* LOGO CONTAINER - Improved Glass Effect */}
