@@ -118,7 +118,7 @@ export const projects = [
     { id: 3, name: "Sis Blessing Ukachi" },
     { id: 4, name: "Sis Sikemi Akinfesoye" },
     { id: 5, name: "Bro Christian Nwagbara" },
-    { id: 6, name: "Bro Ifeanyi Ezeji" },
+    { id: 6, name: "Bro Ifeanyi Ezechi" },
     { id: 7, name: "Bro Wisdom Chidiebere" },
   ],
 },
