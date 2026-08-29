@@ -70,7 +70,7 @@ const ServiceSummary = () => {
   loop
   playsInline
   onLoadedMetadata={(e) => {
-    e.target.playbackRate = 3;
+    e.target.playbackRate = 1;
   }}
   className="w-full h-full object-cover"
   src="/videos/opalfeed-bg.mp4"
